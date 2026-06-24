@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quex/core/constants/app_constants.dart';
 import 'package:quex/core/di/providers.dart';
+import 'package:quex/data/repositories/repository_impl.dart';
 import 'package:quex/domain/entities/entities.dart';
 
 final appRoleProvider = StateProvider<AppRole?>((ref) => null);
@@ -8,6 +9,19 @@ final appRoleProvider = StateProvider<AppRole?>((ref) => null);
 final authStateProvider =
     StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref.read(authRepositoryProvider));
+});
+
+/// Call once at startup to restore persisted login.
+final authHydrationProvider = FutureProvider<void>((ref) async {
+  final repo = ref.read(authRepositoryProvider);
+  if (repo is AuthRepositoryImpl) {
+    await repo.hydrate();
+    if (repo.isAuthenticated) {
+      ref.read(authStateProvider.notifier).restore(
+            phone: repo.phoneNumber,
+          );
+    }
+  }
 });
 
 class AuthState {
@@ -46,6 +60,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier(this._repository) : super(const AuthState());
 
   final dynamic _repository;
+
+  void restore({String? phone}) {
+    state = AuthState(isAuthenticated: true, phone: phone);
+  }
 
   Future<void> sendOtp(String phone) async {
     state = state.copyWith(isLoading: true, error: null);

@@ -17,19 +17,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _goToRoleSelect());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _goNext());
   }
 
-  Future<void> _goToRoleSelect() async {
+  Future<void> _goNext() async {
     await Future<void>.delayed(const Duration(milliseconds: 1200));
     if (!mounted) return;
-    context.go('/role-select');
+    final auth = ref.read(authStateProvider);
+    if (auth.isAuthenticated) {
+      context.go('/customer/home');
+    } else {
+      context.go('/role-select');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -38,8 +43,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               width: 88,
               height: 88,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppColors.accent, width: 2),
               ),
               alignment: Alignment.center,
               child: const Text(
@@ -47,7 +53,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 style: TextStyle(
                   fontSize: 48,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.primary,
+                  color: AppColors.accent,
                 ),
               ),
             ),
@@ -55,17 +61,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             Text(
               AppConstants.appName,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     fontWeight: FontWeight.w800,
                   ),
             ),
             const SizedBox(height: 8),
             Text(
               AppConstants.tagline,
-              style: const TextStyle(color: Colors.white70, fontSize: 16),
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 16),
             ),
             const SizedBox(height: 48),
-            const CircularProgressIndicator(color: Colors.white),
+            const CircularProgressIndicator(color: AppColors.accent),
           ],
         ),
       ),
@@ -155,6 +161,11 @@ class _RoleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: AppColors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: AppColors.divider),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),

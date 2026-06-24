@@ -17,6 +17,10 @@ class Business extends Equatable {
     this.phone,
     this.services = const [],
     this.hours,
+    this.latitude = 30.2672,
+    this.longitude = -97.7431,
+    this.landmark,
+    this.closesAt,
   });
 
   final String id;
@@ -33,6 +37,10 @@ class Business extends Equatable {
   final String? phone;
   final List<String> services;
   final String? hours;
+  final double latitude;
+  final double longitude;
+  final String? landmark;
+  final String? closesAt;
 
   @override
   List<Object?> get props => [

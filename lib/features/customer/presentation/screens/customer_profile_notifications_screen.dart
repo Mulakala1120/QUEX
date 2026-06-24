@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:quex/core/theme/app_theme.dart';
 import 'package:quex/core/widgets/common_widgets.dart';
-import 'package:quex/features/customer/presentation/widgets/customer_nav_bar.dart';
+import 'package:quex/features/customer/presentation/providers/customer_session_provider.dart';
+import 'package:quex/features/customer/presentation/widgets/customer_dark_widgets.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
 
 class NotificationsScreen extends ConsumerWidget {
@@ -15,7 +16,14 @@ class NotificationsScreen extends ConsumerWidget {
     final notifications = ref.watch(notificationsProvider);
 
     return Scaffold(
-      appBar: const QueXAppBar(title: 'Notifications'),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Notifications'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
+      ),
       body: notifications.when(
         data: (list) {
           if (list.isEmpty) {
@@ -30,40 +38,58 @@ class NotificationsScreen extends ConsumerWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final n = list[index];
-              return Card(
-                color: n.isRead ? AppColors.surface : AppColors.primary.withValues(alpha: 0.04),
-                child: ListTile(
-                  leading: Icon(
-                    n.isRead
-                        ? Icons.notifications_outlined
-                        : Icons.notifications_active,
-                    color: n.isRead
-                        ? AppColors.textSecondary
-                        : AppColors.primary,
+              return Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: n.isRead
+                      ? AppColors.surface
+                      : AppColors.accent.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: n.isRead ? AppColors.divider : AppColors.accent.withValues(alpha: 0.3),
                   ),
-                  title: Text(
-                    n.title,
-                    style: TextStyle(
-                      fontWeight:
-                          n.isRead ? FontWeight.w500 : FontWeight.w700,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      n.isRead
+                          ? Icons.notifications_outlined
+                          : Icons.notifications_active,
+                      color: n.isRead ? AppColors.textSecondary : AppColors.accent,
                     ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 4),
-                      Text(n.body),
-                      const SizedBox(height: 4),
-                      Text(
-                        DateFormat.MMMd().add_jm().format(n.createdAt),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            n.title,
+                            style: TextStyle(
+                              fontWeight:
+                                  n.isRead ? FontWeight.w500 : FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            n.body,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            DateFormat.MMMd().add_jm().format(n.createdAt),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  isThreeLine: true,
+                    ),
+                  ],
                 ),
               );
             },
@@ -82,79 +108,186 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileProvider);
+    final auth = ref.watch(authStateProvider);
 
     return Scaffold(
-      appBar: const QueXAppBar(title: 'Profile', showBack: false),
-      body: profile.when(
-        data: (p) => ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            Center(
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 48,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                    child: Text(
-                      p.name.isNotEmpty ? p.name[0].toUpperCase() : 'G',
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: profile.when(
+          data: (p) => ListView(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+            children: [
+              if (!auth.isAuthenticated) ...[
+                DarkCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Create an account',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'With an account you can favorite salons and more!',
+                        style: TextStyle(color: AppColors.textSecondary),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () => context.go('/customer/login'),
+                        child: const Text('Sign up'),
+                      ),
+                      const SizedBox(height: 12),
+                      Center(
+                        child: TextButton(
+                          onPressed: () => context.go('/customer/login'),
+                          child: const Text('Sign in'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else ...[
+                DarkCard(
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: AppColors.accent.withValues(alpha: 0.2),
+                        child: Text(
+                          p.name.isNotEmpty ? p.name[0].toUpperCase() : 'Q',
+                          style: const TextStyle(
+                            color: AppColors.accent,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 22,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              p.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              auth.phone ?? p.phone,
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 28),
+              const _SectionHeader('PREFERENCES'),
+              const SizedBox(height: 8),
+              DarkCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
+                    _ProfileTile(
+                      icon: Icons.notifications_outlined,
+                      title: 'Communication Settings',
+                      onTap: () => context.push('/customer/notifications'),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    p.name,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
+                    const Divider(color: AppColors.divider, height: 1),
+                    const _ProfileTile(
+                      icon: Icons.wb_sunny_outlined,
+                      title: 'Display',
+                      onTap: null,
                     ),
-                  ),
-                  Text(
-                    p.phone,
-                    style: const TextStyle(color: AppColors.textSecondary),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 32),
-            _ProfileTile(
-              icon: Icons.notifications_outlined,
-              title: 'Notifications',
-              onTap: () => context.push('/customer/notifications'),
-            ),
-            _ProfileTile(
-              icon: Icons.history,
-              title: 'Visit History',
-              onTap: () {},
-            ),
-            _ProfileTile(
-              icon: Icons.help_outline,
-              title: 'Help & Support',
-              onTap: () {},
-            ),
-            _ProfileTile(
-              icon: Icons.logout,
-              title: 'Sign Out',
-              color: AppColors.error,
-              onTap: () async {
-                await ref.read(authStateProvider.notifier).logout();
-                if (context.mounted) context.go('/role-select');
-              },
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () => context.go('/role-select'),
-              child: const Text('Switch App Role'),
-            ),
-          ],
+              const SizedBox(height: 28),
+              const _SectionHeader('HELP & POLICIES'),
+              const SizedBox(height: 8),
+              DarkCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
+                    const _ProfileTile(
+                      icon: Icons.help_outline,
+                      title: 'Customer Service',
+                      external: true,
+                      onTap: null,
+                    ),
+                    const Divider(color: AppColors.divider, height: 1),
+                    const _ProfileTile(
+                      icon: Icons.accessibility_new_outlined,
+                      title: 'Accessibility Notice',
+                      external: true,
+                      onTap: null,
+                    ),
+                    const Divider(color: AppColors.divider, height: 1),
+                    _ProfileTile(
+                      icon: Icons.description_outlined,
+                      title: 'Legal and Privacy',
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+              if (auth.isAuthenticated)
+                TextButton(
+                  onPressed: () async {
+                    await ref.read(activeCheckInProvider.notifier).cancelCheckIn();
+                    await ref.read(authStateProvider.notifier).logout();
+                    if (context.mounted) context.go('/role-select');
+                  },
+                  child: const Text(
+                    'Sign Out',
+                    style: TextStyle(color: AppColors.error),
+                  ),
+                ),
+              const Center(
+                child: Text(
+                  'Version 1.0.0',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          loading: () => const LoadingView(),
+          error: (e, _) => EmptyState(icon: Icons.error, title: e.toString()),
         ),
-        loading: () => const LoadingView(),
-        error: (e, _) => EmptyState(icon: Icons.error, title: e.toString()),
       ),
-      bottomNavigationBar: const CustomerNavBar(currentIndex: 3),
+      bottomNavigationBar: const CustomerNavBar(currentIndex: 2),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader(this.title);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: AppColors.textSecondary,
+        fontSize: 12,
+        letterSpacing: 1,
+        fontWeight: FontWeight.w700,
+      ),
     );
   }
 }
@@ -164,24 +297,25 @@ class _ProfileTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.onTap,
-    this.color,
+    this.external = false,
   });
 
   final IconData icon;
   final String title;
-  final VoidCallback onTap;
-  final Color? color;
+  final VoidCallback? onTap;
+  final bool external;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(icon, color: color ?? AppColors.primary),
-        title: Text(title, style: TextStyle(color: color)),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
+    return ListTile(
+      leading: Icon(icon, color: AppColors.accent),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+      trailing: Icon(
+        external ? Icons.open_in_new : Icons.chevron_right,
+        color: AppColors.textSecondary,
+        size: 20,
       ),
+      onTap: onTap,
     );
   }
 }

@@ -1,8 +1,9 @@
 import 'package:quex/domain/entities/entities.dart';
 
 abstract class BusinessRepository {
-  Future<List<Business>> getNearbyBusinesses();
+  Future<List<Business>> getNearbyBusinesses({int page = 0, int limit = 50});
   Future<List<Business>> searchBusinesses(String query);
+  Future<List<Business>> getByCategory(String category);
   Future<Business?> getBusinessById(String id);
 }
 
@@ -15,6 +16,7 @@ abstract class QueueRepository {
     String? phone,
   });
   Future<QueueEntry?> getActiveQueueForCustomer(String customerId);
+  Future<void> leaveQueue(String entryId);
   Future<void> callNext(String businessId);
   Future<void> skipCustomer(String entryId);
   Future<void> markNoShow(String entryId);

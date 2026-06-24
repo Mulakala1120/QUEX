@@ -30,12 +30,18 @@ class _CustomerSearchScreenState extends ConsumerState<CustomerSearchScreen> {
     final results = ref.watch(businessSearchProvider(_query));
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
         title: TextField(
           controller: _controller,
           autofocus: true,
+          style: const TextStyle(color: AppColors.textPrimary),
           decoration: const InputDecoration(
-            hintText: 'Search...',
+            hintText: 'Search salons, clinics...',
             border: InputBorder.none,
           ),
           onChanged: (v) => setState(() => _query = v),
@@ -63,7 +69,7 @@ class _CustomerSearchScreenState extends ConsumerState<CustomerSearchScreen> {
             itemBuilder: (context, index) => BusinessCard(
               business: list[index],
               onTap: () =>
-                  context.push('/customer/business/${list[index].id}'),
+                  context.push('/customer/check-in/${list[index].id}'),
             ),
           );
         },
@@ -74,7 +80,6 @@ class _CustomerSearchScreenState extends ConsumerState<CustomerSearchScreen> {
           subtitle: e.toString(),
         ),
       ),
-      bottomNavigationBar: const CustomerNavBar(currentIndex: 1),
     );
   }
 }

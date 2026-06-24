@@ -18,11 +18,13 @@ class CustomerLoginScreen extends ConsumerStatefulWidget {
 
 class _CustomerLoginScreenState extends ConsumerState<CustomerLoginScreen> {
   final _phoneController = TextEditingController(text: '+1 ');
+  final _otpController = TextEditingController();
   bool _showOtp = false;
 
   @override
   void dispose() {
     _phoneController.dispose();
+    _otpController.dispose();
     super.dispose();
   }
 
@@ -91,6 +93,7 @@ class _CustomerLoginScreenState extends ConsumerState<CustomerLoginScreen> {
               ] else ...[
                 Center(
                   child: Pinput(
+                    controller: _otpController,
                     length: AppConstants.otpLength,
                     defaultPinTheme: PinTheme(
                       width: 48,
@@ -134,7 +137,7 @@ class _CustomerLoginScreenState extends ConsumerState<CustomerLoginScreen> {
                 PrimaryButton(
                   label: 'Verify & Continue',
                   isLoading: auth.isLoading,
-                  onPressed: () {},
+                  onPressed: () => _verifyOtp(_otpController.text),
                 ),
               ],
             ],
