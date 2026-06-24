@@ -38,6 +38,6 @@ class DefaultFirebaseOptions {
     appId: '1:000000000000:ios:demo',
     messagingSenderId: '000000000000',
     projectId: 'quex-demo',
-    iosBundleId: 'com.quex.quex',
+    iosBundleId: 'com.quex.app',
   );
 }
