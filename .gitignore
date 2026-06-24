@@ -40,10 +40,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Firebase
+# Firebase (keep firebase_options.dart for demo; replace via flutterfire configure)
 google-services.json
 GoogleService-Info.plist
-firebase_options.dart
 
 # Environment
 .env
