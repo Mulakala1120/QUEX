@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   static const primary = Color(0xFF1B4D3E);
@@ -29,9 +28,10 @@ class AppTheme {
     );
 
     return base.copyWith(
-      textTheme: GoogleFonts.interTextTheme(base.textTheme).apply(
+      textTheme: base.textTheme.apply(
         bodyColor: AppColors.textPrimary,
         displayColor: AppColors.textPrimary,
+        fontFamily: 'Roboto',
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
@@ -92,7 +92,7 @@ class AppTheme {
         backgroundColor: AppColors.surface,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textSecondary,
-        type: BottomNavigationBarNavigationBarType.fixed,
+        type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
     );

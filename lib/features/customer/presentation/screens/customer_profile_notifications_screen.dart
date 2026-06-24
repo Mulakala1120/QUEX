@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:quex/core/theme/app_theme.dart';
 import 'package:quex/core/widgets/common_widgets.dart';
+import 'package:quex/features/customer/presentation/widgets/customer_nav_bar.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
 
 class NotificationsScreen extends ConsumerWidget {
@@ -153,33 +154,7 @@ class ProfileScreen extends ConsumerWidget {
         loading: () => const LoadingView(),
         error: (e, _) => EmptyState(icon: Icons.error, title: e.toString()),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 3,
-        onTap: (i) {
-          switch (i) {
-            case 0:
-              context.go('/customer/home');
-            case 1:
-              context.go('/customer/search');
-            case 2:
-              context.go('/customer/queue');
-            case 3:
-              context.go('/customer/profile');
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.hourglass_top_outlined),
-            label: 'Queue',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
-          ),
-        ],
-      ),
+      bottomNavigationBar: const CustomerNavBar(currentIndex: 3),
     );
   }
 }

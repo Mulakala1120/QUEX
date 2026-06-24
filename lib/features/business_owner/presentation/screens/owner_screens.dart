@@ -742,7 +742,7 @@ class SubscriptionScreen extends ConsumerWidget {
                         ),
                         if (plan.isCurrent) ...[
                           const SizedBox(width: 8),
-                          const StatusChip(
+                          StatusChip(
                             label: 'Current',
                             color: AppColors.primary,
                           ),

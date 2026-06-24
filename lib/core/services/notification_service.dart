@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:quex/core/config/app_config.dart';
 
@@ -6,40 +7,48 @@ class NotificationService {
   NotificationService({
     FirebaseMessaging? messaging,
     FlutterLocalNotificationsPlugin? localNotifications,
-  })  : _messaging = messaging ?? FirebaseMessaging.instance,
-        _localNotifications =
-            localNotifications ?? FlutterLocalNotificationsPlugin();
+  })  : _messaging = messaging,
+        _localNotifications = localNotifications;
 
-  final FirebaseMessaging _messaging;
-  final FlutterLocalNotificationsPlugin _localNotifications;
+  final FirebaseMessaging? _messaging;
+  final FlutterLocalNotificationsPlugin? _localNotifications;
 
   Future<void> initialize() async {
-    if (!AppConfig.enablePushNotifications) return;
+    if (!AppConfig.enablePushNotifications || kIsWeb) return;
 
+    final localNotifications =
+        _localNotifications ?? FlutterLocalNotificationsPlugin();
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings();
-    await _localNotifications.initialize(
+    await localNotifications.initialize(
       const InitializationSettings(
         android: androidSettings,
         iOS: iosSettings,
       ),
     );
 
-    await _messaging.requestPermission();
-    FirebaseMessaging.onMessage.listen(_showForegroundNotification);
+    final messaging = _messaging ?? FirebaseMessaging.instance;
+    await messaging.requestPermission();
+    FirebaseMessaging.onMessage.listen(
+      (message) => _showForegroundNotification(localNotifications, message),
+    );
   }
 
   Future<String?> getToken() async {
-    if (!AppConfig.enablePushNotifications) return null;
-    return _messaging.getToken();
+    if (!AppConfig.enablePushNotifications || kIsWeb) return null;
+    final messaging = _messaging ?? FirebaseMessaging.instance;
+    return messaging.getToken();
   }
 
-  void _showForegroundNotification(RemoteMessage message) {
+  void _showForegroundNotification(
+    FlutterLocalNotificationsPlugin localNotifications,
+    RemoteMessage message,
+  ) {
     final notification = message.notification;
     if (notification == null) return;
 
-    _localNotifications.show(
+    localNotifications.show(
       notification.hashCode,
       notification.title,
       notification.body,

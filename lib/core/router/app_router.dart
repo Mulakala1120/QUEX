@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quex/features/business_owner/presentation/screens/owner_screens.dart';
 import 'package:quex/features/customer/presentation/screens/customer_home_screen.dart';
@@ -10,7 +9,7 @@ import 'package:quex/features/shared/presentation/screens/splash_screen.dart';
 import 'package:quex/features/staff/presentation/screens/staff_screens.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/role-select',
   routes: [
     GoRoute(
       path: '/',

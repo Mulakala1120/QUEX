@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quex/core/theme/app_theme.dart';
 import 'package:quex/core/widgets/business_card.dart';
 import 'package:quex/core/widgets/common_widgets.dart';
-import 'package:quex/features/customer/presentation/screens/customer_home_screen.dart';
+import 'package:quex/features/customer/presentation/widgets/customer_nav_bar.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
 
 class CustomerSearchScreen extends ConsumerStatefulWidget {
@@ -74,7 +74,7 @@ class _CustomerSearchScreenState extends ConsumerState<CustomerSearchScreen> {
           subtitle: e.toString(),
         ),
       ),
-      bottomNavigationBar: const _CustomerNavBar(currentIndex: 1),
+      bottomNavigationBar: const CustomerNavBar(currentIndex: 1),
     );
   }
 }

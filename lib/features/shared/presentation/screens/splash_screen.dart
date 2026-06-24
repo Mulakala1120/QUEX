@@ -17,9 +17,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future<void>.delayed(const Duration(seconds: 2), () {
-      if (mounted) context.go('/role-select');
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _goToRoleSelect());
+  }
+
+  Future<void> _goToRoleSelect() async {
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    if (!mounted) return;
+    context.go('/role-select');
   }
 
   @override
@@ -76,7 +80,7 @@ class RoleSelectScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,6 +130,7 @@ class RoleSelectScreen extends ConsumerWidget {
                   context.go('/staff/login');
                 },
               ),
+              const SizedBox(height: 24),
             ],
           ),
         ),

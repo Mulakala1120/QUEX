@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quex/core/theme/app_theme.dart';
+import 'package:quex/core/widgets/common_widgets.dart';
 import 'package:quex/domain/entities/entities.dart';
 
 class BusinessCard extends StatelessWidget {
@@ -55,7 +56,7 @@ class BusinessCard extends StatelessWidget {
                           ),
                         ),
                         if (!business.isOpen)
-                          const StatusChip(
+                          StatusChip(
                             label: 'Closed',
                             color: AppColors.error,
                           ),

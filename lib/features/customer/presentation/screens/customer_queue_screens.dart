@@ -6,6 +6,7 @@ import 'package:quex/core/di/providers.dart';
 import 'package:quex/core/theme/app_theme.dart';
 import 'package:quex/core/widgets/common_widgets.dart';
 import 'package:quex/domain/entities/entities.dart';
+import 'package:quex/features/customer/presentation/widgets/customer_nav_bar.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
 
 class BusinessDetailsScreen extends ConsumerWidget {
@@ -312,6 +313,8 @@ class LiveQueueScreen extends ConsumerWidget {
             );
           }
 
+          final activeEntry = myEntry;
+
           return RefreshIndicator(
             onRefresh: () => ref.refresh(queueProvider(businessId).future),
             child: ListView(
@@ -344,7 +347,7 @@ class LiveQueueScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '#${myEntry.position}',
+                        '#${activeEntry.position}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 64,
@@ -353,7 +356,7 @@ class LiveQueueScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '~${myEntry.estimatedWaitMinutes} min wait',
+                        '~${activeEntry.estimatedWaitMinutes} min wait',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -362,7 +365,7 @@ class LiveQueueScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        myEntry.service,
+                        activeEntry.service,
                         style: const TextStyle(color: Colors.white70),
                       ),
                     ],
@@ -377,7 +380,7 @@ class LiveQueueScreen extends ConsumerWidget {
                       ?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 12),
-                ...entries.where((e) => e.position < myEntry.position).map(
+                ...entries.where((e) => e.position < activeEntry.position).map(
                       (e) => Card(
                         child: ListTile(
                           leading: CircleAvatar(
@@ -401,10 +404,7 @@ class LiveQueueScreen extends ConsumerWidget {
         loading: () => const LoadingView(),
         error: (e, _) => EmptyState(icon: Icons.error, title: e.toString()),
       ),
-      bottomNavigationBar: const Padding(
-        padding: EdgeInsets.only(bottom: 0),
-        child: _CustomerNavBarWrapper(currentIndex: 2),
-      ),
+      bottomNavigationBar: const CustomerNavBar(currentIndex: 2),
     );
   }
 
@@ -419,42 +419,5 @@ class LiveQueueScreen extends ConsumerWidget {
       default:
         return AppColors.textSecondary;
     }
-  }
-}
-
-class _CustomerNavBarWrapper extends StatelessWidget {
-  const _CustomerNavBarWrapper({required this.currentIndex});
-
-  final int currentIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: (i) {
-        switch (i) {
-          case 0:
-            context.go('/customer/home');
-          case 1:
-            context.go('/customer/search');
-          case 2:
-            context.go('/customer/queue');
-          case 3:
-            context.go('/customer/profile');
-        }
-      },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.hourglass_top_outlined),
-          label: 'Queue',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          label: 'Profile',
-        ),
-      ],
-    );
   }
 }
