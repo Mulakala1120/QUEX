@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quex/core/di/providers.dart';
 import 'package:quex/core/theme/app_theme.dart';
 import 'package:quex/core/widgets/common_widgets.dart';
+import 'package:quex/core/constants/app_constants.dart';
 import 'package:quex/domain/entities/entities.dart';
 import 'package:quex/features/customer/presentation/providers/customer_session_provider.dart';
 import 'package:quex/features/customer/presentation/widgets/customer_dark_widgets.dart';
@@ -693,7 +694,7 @@ class _LocationCard extends ConsumerWidget {
                   style: const TextStyle(color: AppColors.textSecondary),
                 ),
               Text(
-                ' • ${business.distanceMiles} mi',
+                ' • ${business.distanceMiles} km',
                 style: const TextStyle(color: AppColors.textSecondary),
               ),
             ],

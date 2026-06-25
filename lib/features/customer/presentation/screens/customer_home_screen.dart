@@ -91,12 +91,33 @@ class CustomerHomeScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 4),
                           const Text(
-                            'Skip the wait.\nLive your time.',
+                            "Skip the wait.\nLive your time.",
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w800,
                               height: 1.2,
                             ),
+                          ),
+                          const SizedBox(height: 20),
+                          _CategoryQuickRow(
+                            onSalon: () {
+                              ref.read(businessFiltersProvider.notifier).state =
+                                  const BusinessFilters(
+                                category: 'Salon',
+                                openNowOnly: true,
+                              );
+                              context.go('/customer/map');
+                            },
+                            onHealth: () {
+                              ref.read(businessFiltersProvider.notifier).state =
+                                  const BusinessFilters(
+                                category: 'Health',
+                                openNowOnly: true,
+                              );
+                              context.go('/customer/map');
+                            },
+                            onBrowse: () =>
+                                context.push('/customer/categories'),
                           ),
                           const SizedBox(height: 20),
                           GestureDetector(
@@ -202,6 +223,90 @@ class CustomerHomeScreen extends ConsumerWidget {
   }
 }
 
+class _CategoryQuickRow extends StatelessWidget {
+  const _CategoryQuickRow({
+    required this.onSalon,
+    required this.onHealth,
+    required this.onBrowse,
+  });
+
+  final VoidCallback onSalon;
+  final VoidCallback onHealth;
+  final VoidCallback onBrowse;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _QuickChip(
+            icon: Icons.content_cut,
+            label: 'Salons',
+            onTap: onSalon,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _QuickChip(
+            icon: Icons.medical_services_outlined,
+            label: 'Clinics',
+            onTap: onHealth,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _QuickChip(
+            icon: Icons.grid_view_rounded,
+            label: 'Browse',
+            onTap: onBrowse,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _QuickChip extends StatelessWidget {
+  const _QuickChip({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.divider),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: AppColors.accent, size: 20),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _FeaturedCard extends StatelessWidget {
   const _FeaturedCard({
     required this.business,
@@ -246,7 +351,8 @@ class _FeaturedCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                  business.category == 'Clinic'
+                  business.category == 'Clinic' ||
+                          business.category == 'Hospital'
                       ? Icons.local_hospital_outlined
                       : Icons.content_cut,
                   color: AppColors.accent,
@@ -283,8 +389,13 @@ class _FeaturedCard extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              if (business.isOpen && business.closesAt != null)
+                Text(
+                  ' • Closes ${business.closesAt}',
+                  style: const TextStyle(color: AppColors.textSecondary),
+                ),
               Text(
-                ' • ${business.distanceMiles} mi',
+                ' • ${business.distanceMiles} km',
                 style: const TextStyle(color: AppColors.textSecondary),
               ),
             ],
@@ -300,14 +411,18 @@ class _FeaturedCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              OutlinedButton(
+              OutlinedButton.icon(
                 onPressed: onFavorite,
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(52, 52),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                ),
-                child: Icon(
+                icon: Icon(
                   isFavorite ? Icons.star : Icons.star_outline,
+                  size: 18,
+                ),
+                label: const Text('Favorite'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                 ),
               ),
               if (onViewQueue != null) ...[
@@ -351,7 +466,7 @@ class _SalonRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
-                business.category == 'Clinic'
+                business.category == 'Clinic' || business.category == 'Hospital'
                     ? Icons.medical_services_outlined
                     : Icons.content_cut,
                 color: AppColors.accent,
@@ -388,13 +503,27 @@ class _SalonRow extends StatelessWidget {
               ),
             ),
             if (business.isOpen)
-              Text(
-                '${business.waitMinutes} min',
-                style: const TextStyle(
-                  color: AppColors.accent,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 18,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${business.waitMinutes} min',
+                    style: const TextStyle(
+                      color: AppColors.accent,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const Text(
+                    'EST WAIT',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 9,
+                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
           ],
         ),

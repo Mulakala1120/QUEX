@@ -85,7 +85,7 @@ class BusinessCard extends StatelessWidget {
                           color: AppColors.textSecondary,
                         ),
                         Text(
-                          ' ${business.distanceMiles} mi',
+                          ' ${business.distanceMiles} km',
                           style: const TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 13,
