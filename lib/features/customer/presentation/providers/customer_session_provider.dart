@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quex/core/constants/app_constants.dart';
 import 'package:quex/core/di/providers.dart';
+import 'package:quex/core/services/location_service.dart';
 import 'package:quex/core/services/session_storage.dart';
+import 'package:quex/core/utils/geo_utils.dart';
 import 'package:quex/data/datasources/dummy_data_source.dart';
 import 'package:quex/domain/entities/entities.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
@@ -70,6 +72,12 @@ class FavoritesNotifier extends StateNotifier<Set<String>> {
 
   bool isFavorite(String businessId) => state.contains(businessId);
 }
+
+/// GPS location for nearby sorting; falls back to Hyderabad centre.
+final userLocationProvider = FutureProvider<UserLocation>((ref) async {
+  final service = ref.read(locationServiceProvider);
+  return await service.getCurrentLocation() ?? service.fallback;
+});
 
 final activeCheckInProvider =
     StateNotifierProvider<ActiveCheckInNotifier, ActiveCheckIn?>((ref) {
@@ -191,10 +199,22 @@ class ActiveCheckInNotifier extends StateNotifier<ActiveCheckIn?> {
 
 final filteredBusinessesProvider = FutureProvider<List<Business>>((ref) async {
   final businesses = await ref.watch(businessesProvider.future);
+  final location = await ref.watch(userLocationProvider.future);
   final filters = ref.watch(businessFiltersProvider);
   final favorites = ref.watch(favoritesProvider);
 
-  var result = List<Business>.from(businesses);
+  var result = businesses
+      .map(
+        (b) => b.copyWith(
+          distanceMiles: distanceKm(
+            location.latitude,
+            location.longitude,
+            b.latitude,
+            b.longitude,
+          ),
+        ),
+      )
+      .toList();
 
   if (filters.category != null) {
     if (filters.category == 'Health') {

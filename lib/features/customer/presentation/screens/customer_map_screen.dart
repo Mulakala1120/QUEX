@@ -22,14 +22,27 @@ class CustomerMapScreen extends ConsumerStatefulWidget {
 
 class _CustomerMapScreenState extends ConsumerState<CustomerMapScreen> {
   final _mapController = MapController();
-  static final _center = LatLng(MapConfig.defaultLat, MapConfig.defaultLng);
   bool _mapView = true;
+  bool _centeredOnUser = false;
 
   @override
   Widget build(BuildContext context) {
     final businesses = ref.watch(filteredBusinessesProvider);
     final activeCheckIn = ref.watch(activeCheckInProvider);
     final filters = ref.watch(businessFiltersProvider);
+    final locationAsync = ref.watch(userLocationProvider);
+
+    final userCenter = locationAsync.maybeWhen(
+      data: (loc) => LatLng(loc.latitude, loc.longitude),
+      orElse: () => LatLng(MapConfig.defaultLat, MapConfig.defaultLng),
+    );
+
+    if (!_centeredOnUser && locationAsync.hasValue) {
+      _centeredOnUser = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _mapController.move(userCenter, 12);
+      });
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -74,7 +87,7 @@ class _CustomerMapScreenState extends ConsumerState<CustomerMapScreen> {
                         FlutterMap(
                           mapController: _mapController,
                           options: MapOptions(
-                            initialCenter: _center,
+                            initialCenter: userCenter,
                             initialZoom: 12,
                           ),
                           children: [
@@ -82,7 +95,7 @@ class _CustomerMapScreenState extends ConsumerState<CustomerMapScreen> {
                             MarkerLayer(
                               markers: [
                                 Marker(
-                                  point: _center,
+                                  point: userCenter,
                                   width: 24,
                                   height: 24,
                                   child: Container(
@@ -120,7 +133,7 @@ class _CustomerMapScreenState extends ConsumerState<CustomerMapScreen> {
                           right: 16,
                           child: FloatingActionButton.small(
                             backgroundColor: AppColors.surface,
-                            onPressed: () => _mapController.move(_center, 12),
+                            onPressed: () => _mapController.move(userCenter, 12),
                             child: const Icon(
                               Icons.my_location,
                               color: AppColors.accent,

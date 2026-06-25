@@ -53,6 +53,10 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>QueX uses your location to show nearby salons and clinics with live wait times.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>QueX uses the camera to scan queue QR codes at businesses.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

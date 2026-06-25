@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quex/core/constants/app_constants.dart';
 import 'package:quex/core/theme/app_theme.dart';
+import 'package:quex/core/widgets/quex_brand_logo.dart';
 import 'package:quex/core/widgets/common_widgets.dart';
 import 'package:quex/domain/entities/entities.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
@@ -46,13 +47,17 @@ class _StaffLoginScreenState extends ConsumerState<StaffLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const QueXAppBar(title: 'Staff Login'),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Staff Login'),
+        backgroundColor: AppColors.background,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const QueXLogo(),
+            const QueXBrandLogo(size: 48, style: QueXLogoStyle.dark),
             const SizedBox(height: 24),
             Text(
               'Staff sign in',
@@ -107,11 +112,13 @@ class StaffQueueDashboardScreen extends ConsumerWidget {
     final queueState = ref.watch(staffQueueProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Queue Dashboard',
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
+        backgroundColor: AppColors.background,
         actions: [
           IconButton(
             onPressed: () => ref.read(staffQueueProvider.notifier).refresh(),

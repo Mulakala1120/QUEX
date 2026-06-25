@@ -218,6 +218,12 @@ class ProfileScreen extends ConsumerWidget {
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
+                    _ProfileTile(
+                      icon: Icons.qr_code_scanner,
+                      title: 'Scan Queue QR',
+                      onTap: () => context.push('/customer/scan'),
+                    ),
+                    const Divider(color: AppColors.divider, height: 1),
                     const _ProfileTile(
                       icon: Icons.help_outline,
                       title: 'Customer Service',

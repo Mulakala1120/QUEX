@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quex/features/admin/presentation/screens/admin_extra_screens.dart';
 import 'package:quex/features/admin/presentation/screens/admin_screens.dart';
+import 'package:quex/features/customer/presentation/screens/customer_qr_scan_screen.dart';
 import 'package:quex/features/business_owner/presentation/screens/owner_screens.dart';
 import 'package:quex/features/customer/presentation/screens/customer_business_detail_screen.dart';
 import 'package:quex/features/customer/presentation/screens/customer_category_screen.dart';
@@ -103,6 +105,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const NotificationsScreen(),
       ),
       GoRoute(
+        path: '/customer/scan',
+        builder: (context, state) => const CustomerQrScanScreen(),
+      ),
+      GoRoute(
         path: '/customer/profile',
         builder: (context, state) => const ProfileScreen(),
       ),
@@ -122,11 +128,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/admin/appointments',
-        builder: (context, state) => const AdminPlaceholderScreen(
-          route: '/admin/appointments',
-          title: 'Appointments',
-          icon: Icons.calendar_today_outlined,
-        ),
+        builder: (context, state) => const AdminAppointmentsScreen(),
       ),
       GoRoute(
         path: '/admin/analytics',
@@ -134,35 +136,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/admin/customers',
-        builder: (context, state) => const AdminPlaceholderScreen(
-          route: '/admin/customers',
-          title: 'Customers',
-          icon: Icons.group_outlined,
-        ),
+        builder: (context, state) => const AdminCustomersScreen(),
       ),
       GoRoute(
         path: '/admin/services',
-        builder: (context, state) => const AdminPlaceholderScreen(
-          route: '/admin/services',
-          title: 'Services',
-          icon: Icons.cut_outlined,
-        ),
+        builder: (context, state) => const AdminServicesScreen(),
       ),
       GoRoute(
         path: '/admin/staff',
-        builder: (context, state) => const AdminPlaceholderScreen(
-          route: '/admin/staff',
-          title: 'Staff Management',
-          icon: Icons.badge_outlined,
-        ),
+        builder: (context, state) => const AdminStaffScreen(),
       ),
       GoRoute(
         path: '/admin/notifications',
-        builder: (context, state) => const AdminPlaceholderScreen(
-          route: '/admin/notifications',
-          title: 'Notifications',
-          icon: Icons.notifications_outlined,
-        ),
+        builder: (context, state) => const AdminNotificationsScreen(),
       ),
       GoRoute(
         path: '/admin/settings',

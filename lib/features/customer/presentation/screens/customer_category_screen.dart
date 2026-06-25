@@ -49,6 +49,11 @@ class CustomerCategoryScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  IconButton(
+                    onPressed: () => context.push('/customer/scan'),
+                    icon: const Icon(Icons.qr_code_scanner),
+                    tooltip: 'Scan queue QR',
+                  ),
                 ],
               ),
               const SizedBox(height: 24),

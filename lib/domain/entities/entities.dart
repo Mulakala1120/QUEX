@@ -42,6 +42,48 @@ class Business extends Equatable {
   final String? landmark;
   final String? closesAt;
 
+  Business copyWith({
+    String? id,
+    String? name,
+    String? category,
+    String? address,
+    double? distanceMiles,
+    double? rating,
+    int? waitMinutes,
+    int? queueCount,
+    bool? isOpen,
+    String? imageUrl,
+    String? description,
+    String? phone,
+    List<String>? services,
+    String? hours,
+    double? latitude,
+    double? longitude,
+    String? landmark,
+    String? closesAt,
+  }) {
+    return Business(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      address: address ?? this.address,
+      distanceMiles: distanceMiles ?? this.distanceMiles,
+      rating: rating ?? this.rating,
+      waitMinutes: waitMinutes ?? this.waitMinutes,
+      queueCount: queueCount ?? this.queueCount,
+      isOpen: isOpen ?? this.isOpen,
+      imageUrl: imageUrl ?? this.imageUrl,
+      description: description ?? this.description,
+      phone: phone ?? this.phone,
+      services: services ?? this.services,
+      hours: hours ?? this.hours,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      landmark: landmark ?? this.landmark,
+      closesAt: closesAt ?? this.closesAt,
+    );
+  }
+
   @override
   List<Object?> get props => [
         id,

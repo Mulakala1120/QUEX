@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -359,12 +361,26 @@ class LiveQueueScreen extends ConsumerStatefulWidget {
 }
 
 class _LiveQueueScreenState extends ConsumerState<LiveQueueScreen> {
+  Timer? _refreshTimer;
+
   @override
   void initState() {
     super.initState();
     Future<void>.delayed(Duration.zero, () {
       ref.read(activeCheckInProvider.notifier).refresh();
     });
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (!mounted) return;
+      ref.read(activeCheckInProvider.notifier).refresh();
+      final id = ref.read(activeCheckInProvider)?.businessId;
+      if (id != null) ref.invalidate(queueProvider(id));
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   @override
