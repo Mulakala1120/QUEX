@@ -5,9 +5,11 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
 migrate_working_dir/
 
 # IntelliJ related
@@ -47,3 +49,6 @@ GoogleService-Info.plist
 # Environment
 .env
 .env.*
+
+# Mapbox (copy mapbox_secrets.example.dart → mapbox_secrets.dart)
+lib/core/config/mapbox_secrets.dart

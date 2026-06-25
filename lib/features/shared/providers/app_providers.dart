@@ -65,6 +65,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState(isAuthenticated: true, phone: phone);
   }
 
+  void resetLoginFlow() {
+    state = state.copyWith(otpSent: false, error: null, isLoading: false);
+  }
+
   Future<void> sendOtp(String phone) async {
     state = state.copyWith(isLoading: true, error: null);
     try {

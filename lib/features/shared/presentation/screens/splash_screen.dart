@@ -112,6 +112,7 @@ class RoleSelectScreen extends ConsumerWidget {
                 subtitle: 'Find salons & clinics, join queues remotely',
                 onTap: () {
                   ref.read(appRoleProvider.notifier).state = AppRole.customer;
+                  ref.read(authStateProvider.notifier).resetLoginFlow();
                   context.go('/customer/login');
                 },
               ),

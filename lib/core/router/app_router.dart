@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quex/features/business_owner/presentation/screens/owner_screens.dart';
@@ -14,11 +13,10 @@ import 'package:quex/features/shared/providers/app_providers.dart';
 import 'package:quex/features/staff/presentation/screens/staff_screens.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final auth = ref.watch(authStateProvider);
-
-  return GoRouter(
+  final router = GoRouter(
     initialLocation: '/',
     redirect: (context, state) {
+      final auth = ref.read(authStateProvider);
       final path = state.matchedLocation;
       final isCustomerRoute = path.startsWith('/customer');
       final isCustomerLogin = path == '/customer/login';
@@ -131,4 +129,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  ref.listen<AuthState>(authStateProvider, (_, __) => router.refresh());
+  ref.onDispose(router.dispose);
+  return router;
 });
