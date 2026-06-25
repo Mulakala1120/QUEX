@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quex/core/constants/app_constants.dart';
+import 'package:quex/core/theme/admin_theme.dart';
 import 'package:quex/core/theme/app_theme.dart';
-import 'package:quex/core/widgets/common_widgets.dart';
+import 'package:quex/core/widgets/quex_brand_logo.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -25,7 +26,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (!mounted) return;
     final auth = ref.read(authStateProvider);
     if (auth.isAuthenticated) {
-      context.go('/customer/home');
+      context.go('/customer/categories');
     } else {
       context.go('/role-select');
     }
@@ -39,32 +40,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.accent, width: 2),
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                'Q',
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.accent,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              AppConstants.appName,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
+            const QueXBrandLogo(size: 88, style: QueXLogoStyle.dark, showWordmark: true),
             const SizedBox(height: 8),
             Text(
               AppConstants.tagline,
@@ -85,53 +61,65 @@ class RoleSelectScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 32),
-              const QueXLogo(size: 56),
               const SizedBox(height: 24),
-              Text(
-                'Welcome to ${AppConstants.appName}',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+              const QueXBrandLogo(size: 56, style: QueXLogoStyle.dark, showWordmark: true),
+              const SizedBox(height: 8),
+              const Text(
+                AppConstants.tagline,
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+              ),
+              const SizedBox(height: 32),
+              const Text(
+                'Choose your portal',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Choose how you want to use the app',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                'Customer and Business Admin are separate experiences',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
               ),
-              const SizedBox(height: 40),
-              _RoleCard(
+              const SizedBox(height: 28),
+              _PortalCard(
                 icon: Icons.person_outline,
-                title: 'Customer',
-                subtitle: 'Find salons & clinics, join queues remotely',
+                title: 'Customer Portal',
+                subtitle: 'Find salons & clinics, see live wait times, join queues',
+                accent: AppColors.accent,
                 onTap: () {
                   ref.read(appRoleProvider.notifier).state = AppRole.customer;
                   ref.read(authStateProvider.notifier).resetLoginFlow();
-                  context.go('/customer/login');
+                  final auth = ref.read(authStateProvider);
+                  if (auth.isAuthenticated) {
+                    context.go('/customer/categories');
+                  } else {
+                    context.go('/customer/welcome');
+                  }
                 },
               ),
               const SizedBox(height: 16),
-              _RoleCard(
-                icon: Icons.storefront_outlined,
-                title: 'Business Owner',
-                subtitle: 'Manage your queue, staff, and analytics',
+              _PortalCard(
+                icon: Icons.dashboard_outlined,
+                title: 'Business Admin',
+                subtitle: 'Manage queue, staff, analytics & subscriptions',
+                accent: AdminColors.primary,
                 onTap: () {
                   ref.read(appRoleProvider.notifier).state =
                       AppRole.businessOwner;
-                  context.go('/owner/signup');
+                  context.go('/admin/login');
                 },
               ),
               const SizedBox(height: 16),
-              _RoleCard(
+              _PortalCard(
                 icon: Icons.badge_outlined,
-                title: 'Staff / Receptionist',
+                title: 'Staff / Reception',
                 subtitle: 'Run the queue — call next, skip, complete',
+                accent: AppColors.clinicBlue,
                 onTap: () {
                   ref.read(appRoleProvider.notifier).state = AppRole.staff;
                   context.go('/staff/login');
@@ -146,17 +134,19 @@ class RoleSelectScreen extends ConsumerWidget {
   }
 }
 
-class _RoleCard extends StatelessWidget {
-  const _RoleCard({
+class _PortalCard extends StatelessWidget {
+  const _PortalCard({
     required this.icon,
     required this.title,
     required this.subtitle,
+    required this.accent,
     required this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
+  final Color accent;
   final VoidCallback onTap;
 
   @override
@@ -165,11 +155,11 @@ class _RoleCard extends StatelessWidget {
       color: AppColors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppColors.divider),
+        side: BorderSide(color: accent.withValues(alpha: 0.35)),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
@@ -177,10 +167,10 @@ class _RoleCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: accent.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 28),
+                child: Icon(icon, color: accent, size: 28),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -205,7 +195,7 @@ class _RoleCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16),
+              Icon(Icons.arrow_forward_ios, size: 16, color: accent),
             ],
           ),
         ),

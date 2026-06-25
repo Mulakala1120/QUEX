@@ -106,7 +106,7 @@ class CustomerHomeScreen extends ConsumerWidget {
                                 category: 'Salon',
                                 openNowOnly: true,
                               );
-                              context.go('/customer/map');
+                              context.go('/customer/categories');
                             },
                             onHealth: () {
                               ref.read(businessFiltersProvider.notifier).state =
@@ -114,7 +114,7 @@ class CustomerHomeScreen extends ConsumerWidget {
                                 category: 'Health',
                                 openNowOnly: true,
                               );
-                              context.go('/customer/map');
+                              context.go('/customer/categories');
                             },
                             onBrowse: () =>
                                 context.push('/customer/categories'),

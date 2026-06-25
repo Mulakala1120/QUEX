@@ -720,7 +720,7 @@ class _LocationCard extends ConsumerWidget {
             label: 'Cancel check-in',
             onTap: () async {
               await ref.read(activeCheckInProvider.notifier).cancelCheckIn();
-              if (context.mounted) context.go('/customer/home');
+              if (context.mounted) context.go('/customer/categories');
             },
             destructive: true,
           ),

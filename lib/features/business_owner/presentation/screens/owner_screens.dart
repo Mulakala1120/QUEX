@@ -235,7 +235,7 @@ class _QueueSetupScreenState extends ConsumerState<QueueSetupScreen> {
           const SizedBox(height: 32),
           PrimaryButton(
             label: 'Finish Setup',
-            onPressed: () => context.go('/owner/dashboard'),
+              onPressed: () => context.go('/admin/dashboard'),
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 class AppConstants {
   static const appName = 'QueX';
   static const tagline = "India's Live Wait Network";
+  static const brandLine = 'Your time matters.';
   static const defaultCity = 'Hyderabad, India';
   static const apiBaseUrl = 'http://localhost:3000';
   static const useDummyData = true;

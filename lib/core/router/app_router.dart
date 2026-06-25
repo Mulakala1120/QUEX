@@ -1,13 +1,18 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quex/features/admin/presentation/screens/admin_screens.dart';
 import 'package:quex/features/business_owner/presentation/screens/owner_screens.dart';
+import 'package:quex/features/customer/presentation/screens/customer_business_detail_screen.dart';
 import 'package:quex/features/customer/presentation/screens/customer_category_screen.dart';
 import 'package:quex/features/customer/presentation/screens/customer_home_screen.dart';
+import 'package:quex/features/customer/presentation/screens/customer_list_screen.dart';
 import 'package:quex/features/customer/presentation/screens/customer_login_screen.dart';
 import 'package:quex/features/customer/presentation/screens/customer_map_screen.dart';
 import 'package:quex/features/customer/presentation/screens/customer_profile_notifications_screen.dart';
 import 'package:quex/features/customer/presentation/screens/customer_queue_screens.dart';
 import 'package:quex/features/customer/presentation/screens/customer_search_screen.dart';
+import 'package:quex/features/customer/presentation/screens/customer_welcome_screen.dart';
 import 'package:quex/features/shared/presentation/screens/splash_screen.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
 import 'package:quex/features/staff/presentation/screens/staff_screens.dart';
@@ -19,15 +24,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final auth = ref.read(authStateProvider);
       final path = state.matchedLocation;
       final isCustomerRoute = path.startsWith('/customer');
-      final isCustomerLogin = path == '/customer/login';
+      final isCustomerAuth = path == '/customer/welcome' || path == '/customer/login';
       final isSplash = path == '/';
       final isRoleSelect = path == '/role-select';
 
-      if (isCustomerRoute && !auth.isAuthenticated && !isCustomerLogin) {
-        return '/customer/login';
+      if (isCustomerRoute && !auth.isAuthenticated && !isCustomerAuth) {
+        return '/customer/welcome';
       }
-      if (auth.isAuthenticated && isCustomerLogin) {
-        return '/customer/home';
+      if (auth.isAuthenticated && isCustomerAuth) {
+        return '/customer/categories';
       }
       if (isSplash || isRoleSelect) return null;
       return null;
@@ -41,6 +46,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/role-select',
         builder: (context, state) => const RoleSelectScreen(),
       ),
+
+      // ── Customer Portal ──────────────────────────────────────────────
+      GoRoute(
+        path: '/customer/welcome',
+        builder: (context, state) => const CustomerWelcomeScreen(),
+      ),
       GoRoute(
         path: '/customer/login',
         builder: (context, state) => const CustomerLoginScreen(),
@@ -52,6 +63,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/customer/categories',
         builder: (context, state) => const CustomerCategoryScreen(),
+      ),
+      GoRoute(
+        path: '/customer/list',
+        builder: (context, state) => const CustomerListScreen(),
       ),
       GoRoute(
         path: '/customer/search',
@@ -69,7 +84,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/customer/business/:id',
-        builder: (context, state) => BusinessDetailsScreen(
+        builder: (context, state) => CustomerBusinessDetailScreen(
           businessId: state.pathParameters['id']!,
         ),
       ),
@@ -91,6 +106,78 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/customer/profile',
         builder: (context, state) => const ProfileScreen(),
       ),
+
+      // ── Business Admin Portal ──────────────────────────────────────
+      GoRoute(
+        path: '/admin/login',
+        builder: (context, state) => const AdminLoginScreen(),
+      ),
+      GoRoute(
+        path: '/admin/dashboard',
+        builder: (context, state) => const AdminDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/admin/queue',
+        builder: (context, state) => const AdminLiveQueueScreen(),
+      ),
+      GoRoute(
+        path: '/admin/appointments',
+        builder: (context, state) => const AdminPlaceholderScreen(
+          route: '/admin/appointments',
+          title: 'Appointments',
+          icon: Icons.calendar_today_outlined,
+        ),
+      ),
+      GoRoute(
+        path: '/admin/analytics',
+        builder: (context, state) => const AdminAnalyticsScreen(),
+      ),
+      GoRoute(
+        path: '/admin/customers',
+        builder: (context, state) => const AdminPlaceholderScreen(
+          route: '/admin/customers',
+          title: 'Customers',
+          icon: Icons.group_outlined,
+        ),
+      ),
+      GoRoute(
+        path: '/admin/services',
+        builder: (context, state) => const AdminPlaceholderScreen(
+          route: '/admin/services',
+          title: 'Services',
+          icon: Icons.cut_outlined,
+        ),
+      ),
+      GoRoute(
+        path: '/admin/staff',
+        builder: (context, state) => const AdminPlaceholderScreen(
+          route: '/admin/staff',
+          title: 'Staff Management',
+          icon: Icons.badge_outlined,
+        ),
+      ),
+      GoRoute(
+        path: '/admin/notifications',
+        builder: (context, state) => const AdminPlaceholderScreen(
+          route: '/admin/notifications',
+          title: 'Notifications',
+          icon: Icons.notifications_outlined,
+        ),
+      ),
+      GoRoute(
+        path: '/admin/settings',
+        builder: (context, state) => const AdminSettingsScreen(),
+      ),
+      GoRoute(
+        path: '/admin/subscription',
+        builder: (context, state) => const AdminSubscriptionScreen(),
+      ),
+      GoRoute(
+        path: '/admin/qr',
+        builder: (context, state) => const AdminQrScreen(),
+      ),
+
+      // ── Owner onboarding (signup flow) ─────────────────────────────
       GoRoute(
         path: '/owner/signup',
         builder: (context, state) => const BusinessSignupScreen(),
@@ -105,20 +192,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/owner/dashboard',
-        builder: (context, state) => const OwnerDashboardScreen(),
-      ),
-      GoRoute(
-        path: '/owner/qr',
-        builder: (context, state) => const QrCodeScreen(),
+        redirect: (_, __) => '/admin/dashboard',
       ),
       GoRoute(
         path: '/owner/analytics',
-        builder: (context, state) => const AnalyticsScreen(),
+        redirect: (_, __) => '/admin/analytics',
       ),
       GoRoute(
         path: '/owner/subscription',
-        builder: (context, state) => const SubscriptionScreen(),
+        redirect: (_, __) => '/admin/subscription',
       ),
+      GoRoute(
+        path: '/owner/qr',
+        redirect: (_, __) => '/admin/qr',
+      ),
+
+      // ── Staff ──────────────────────────────────────────────────────
       GoRoute(
         path: '/staff/login',
         builder: (context, state) => const StaffLoginScreen(),

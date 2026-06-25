@@ -98,7 +98,7 @@ class CustomerCategoryScreen extends ConsumerWidget {
                     final b = list[index];
                     return _PopularCard(
                       business: b,
-                      onTap: () => context.push('/customer/check-in/${b.id}'),
+                      onTap: () => context.push('/customer/business/${b.id}'),
                     );
                   },
                 ),
@@ -111,6 +111,7 @@ class CustomerCategoryScreen extends ConsumerWidget {
           error: (e, _) => Center(child: Text('$e')),
         ),
       ),
+      bottomNavigationBar: const CustomerNavBar(currentIndex: 0),
     );
   }
 
@@ -119,7 +120,7 @@ class CustomerCategoryScreen extends ConsumerWidget {
       category: category,
       openNowOnly: true,
     );
-    context.go('/customer/map');
+    context.go('/customer/list');
   }
 }
 

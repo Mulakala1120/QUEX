@@ -28,7 +28,7 @@ class CustomerNavBar extends StatelessWidget {
                 activeIcon: Icons.home,
                 label: 'Home',
                 isActive: currentIndex == 0,
-                onTap: () => context.go('/customer/home'),
+                onTap: () => context.go('/customer/categories'),
               ),
               _NavItem(
                 icon: Icons.map_outlined,
