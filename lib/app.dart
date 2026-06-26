@@ -13,8 +13,8 @@ class QueXApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'QueX',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
-      darkTheme: AppTheme.dark,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.light,
       routerConfig: router,
     );
   }

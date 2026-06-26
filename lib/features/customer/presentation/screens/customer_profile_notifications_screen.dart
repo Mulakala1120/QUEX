@@ -7,6 +7,7 @@ import 'package:quex/core/widgets/common_widgets.dart';
 import 'package:quex/features/customer/presentation/providers/customer_session_provider.dart';
 import 'package:quex/features/customer/presentation/widgets/customer_dark_widgets.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
+import 'package:quex/ui_kit/quex_ui_kit.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -18,7 +19,10 @@ class NotificationsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: const Text(
+          'Notifications',
+          style: TextStyle(fontWeight: FontWeight.w900),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -33,32 +37,41 @@ class NotificationsScreen extends ConsumerWidget {
             );
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 110),
             itemCount: list.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, __) => const SizedBox(height: 14),
             itemBuilder: (context, index) {
               final n = list[index];
-              return Container(
+              return QxGlassCard(
+                radius: 24,
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: n.isRead
-                      ? AppColors.surface
-                      : AppColors.accent.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: n.isRead ? AppColors.divider : AppColors.accent.withValues(alpha: 0.3),
-                  ),
-                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      n.isRead
-                          ? Icons.notifications_outlined
-                          : Icons.notifications_active,
-                      color: n.isRead ? AppColors.textSecondary : AppColors.accent,
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: n.isRead
+                            ? AppColors.surfaceLight
+                            : AppColors.accent.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: n.isRead
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : AppColors.accent.withValues(alpha: 0.28),
+                        ),
+                      ),
+                      child: Icon(
+                        n.isRead
+                            ? Icons.notifications_outlined
+                            : Icons.notifications_active,
+                        color: n.isRead
+                            ? AppColors.textSecondary
+                            : AppColors.accent,
+                      ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,8 +79,9 @@ class NotificationsScreen extends ConsumerWidget {
                           Text(
                             n.title,
                             style: TextStyle(
+                              fontSize: 15,
                               fontWeight:
-                                  n.isRead ? FontWeight.w500 : FontWeight.w700,
+                                  n.isRead ? FontWeight.w700 : FontWeight.w900,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -98,6 +112,7 @@ class NotificationsScreen extends ConsumerWidget {
         loading: () => const LoadingView(),
         error: (e, _) => EmptyState(icon: Icons.error, title: e.toString()),
       ),
+      bottomNavigationBar: const CustomerNavBar(currentIndex: -1),
     );
   }
 }
@@ -117,8 +132,18 @@ class ProfileScreen extends ConsumerWidget {
           data: (p) => ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
             children: [
+              const Text(
+                'Profile',
+                style: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.8,
+                ),
+              ),
+              const SizedBox(height: 18),
               if (!auth.isAuthenticated) ...[
-                DarkCard(
+                QxGlassCard(
+                  radius: 28,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -150,98 +175,108 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
               ] else ...[
-                DarkCard(
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: AppColors.accent.withValues(alpha: 0.2),
-                        child: Text(
-                          p.name.isNotEmpty ? p.name[0].toUpperCase() : 'Q',
-                          style: const TextStyle(
-                            color: AppColors.accent,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 22,
+                QxGlow(
+                  blur: 28,
+                  child: QxGlassCard(
+                    radius: 28,
+                    padding: const EdgeInsets.all(18),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 32,
+                          backgroundColor:
+                              AppColors.accent.withValues(alpha: 0.2),
+                          child: Text(
+                            p.name.isNotEmpty ? p.name[0].toUpperCase() : 'Q',
+                            style: const TextStyle(
+                              color: AppColors.accent,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 22,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              p.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 18,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                p.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 18,
+                                ),
                               ),
-                            ),
-                            Text(
-                              auth.phone ?? p.phone,
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
+                              Text(
+                                auth.phone ?? p.phone,
+                                style: const TextStyle(
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Favorites - Queue History - Settings',
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
               const SizedBox(height: 28),
-              const _SectionHeader('PREFERENCES'),
+              const _SectionHeader('PROFILE'),
               const SizedBox(height: 8),
-              DarkCard(
+              QxGlassCard(
+                radius: 24,
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
+                    const _ProfileTile(
+                      icon: Icons.favorite_border,
+                      title: 'Favorites',
+                      onTap: null,
+                    ),
+                    const Divider(color: AppColors.divider, height: 1),
                     _ProfileTile(
-                      icon: Icons.notifications_outlined,
-                      title: 'Communication Settings',
-                      onTap: () => context.push('/customer/notifications'),
+                      icon: Icons.history_rounded,
+                      title: 'Queue History',
+                      onTap: () => context.push('/customer/bookings'),
                     ),
                     const Divider(color: AppColors.divider, height: 1),
                     const _ProfileTile(
-                      icon: Icons.wb_sunny_outlined,
-                      title: 'Display',
+                      icon: Icons.settings_outlined,
+                      title: 'Settings',
                       onTap: null,
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 28),
-              const _SectionHeader('HELP & POLICIES'),
+              const _SectionHeader('SUPPORT'),
               const SizedBox(height: 8),
-              DarkCard(
+              QxGlassCard(
+                radius: 24,
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
-                    _ProfileTile(
-                      icon: Icons.qr_code_scanner,
-                      title: 'Scan Queue QR',
-                      onTap: () => context.push('/customer/scan'),
-                    ),
-                    const Divider(color: AppColors.divider, height: 1),
                     const _ProfileTile(
                       icon: Icons.help_outline,
-                      title: 'Customer Service',
-                      external: true,
-                      onTap: null,
-                    ),
-                    const Divider(color: AppColors.divider, height: 1),
-                    const _ProfileTile(
-                      icon: Icons.accessibility_new_outlined,
-                      title: 'Accessibility Notice',
+                      title: 'Support',
                       external: true,
                       onTap: null,
                     ),
                     const Divider(color: AppColors.divider, height: 1),
                     _ProfileTile(
-                      icon: Icons.description_outlined,
-                      title: 'Legal and Privacy',
-                      onTap: () {},
+                      icon: Icons.notifications_outlined,
+                      title: 'Notifications',
+                      onTap: () => context.push('/customer/notifications'),
                     ),
                   ],
                 ),
@@ -250,9 +285,11 @@ class ProfileScreen extends ConsumerWidget {
               if (auth.isAuthenticated)
                 TextButton(
                   onPressed: () async {
-                    await ref.read(activeCheckInProvider.notifier).cancelCheckIn();
+                    await ref
+                        .read(activeCheckInProvider.notifier)
+                        .cancelCheckIn();
                     await ref.read(authStateProvider.notifier).logout();
-                    if (context.mounted) context.go('/role-select');
+                    if (context.mounted) context.go('/customer/login');
                   },
                   child: const Text(
                     'Sign Out',

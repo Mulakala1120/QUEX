@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:quex/core/theme/app_theme.dart';
 import 'package:quex/core/widgets/common_widgets.dart';
+import 'package:quex/domain/entities/entities.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
 
 class BusinessSignupScreen extends ConsumerStatefulWidget {
@@ -57,24 +58,21 @@ class _BusinessSignupScreenState extends ConsumerState<BusinessSignupScreen> {
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(labelText: 'Business name'),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Required' : null,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(labelText: 'Email'),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Required' : null,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(labelText: 'Phone'),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Required' : null,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
                 const Spacer(),
                 PrimaryButton(
@@ -130,7 +128,7 @@ class _BusinessProfileSetupScreenState
             ),
             const SizedBox(height: 24),
             DropdownButtonFormField<String>(
-              value: _category,
+              initialValue: _category,
               decoration: const InputDecoration(labelText: 'Category'),
               items: const [
                 DropdownMenuItem(value: 'Salon', child: Text('Salon')),
@@ -235,7 +233,7 @@ class _QueueSetupScreenState extends ConsumerState<QueueSetupScreen> {
           const SizedBox(height: 32),
           PrimaryButton(
             label: 'Finish Setup',
-              onPressed: () => context.go('/admin/dashboard'),
+            onPressed: () => context.go('/admin/dashboard'),
           ),
         ],
       ),
@@ -314,143 +312,293 @@ class OwnerDashboardScreen extends ConsumerWidget {
     final analytics = ref.watch(analyticsProvider(businessId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard', style: TextStyle(fontWeight: FontWeight.w700)),
-        actions: [
-          IconButton(
-            onPressed: () => context.push('/owner/qr'),
-            icon: const Icon(Icons.qr_code),
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          ref.invalidate(queueProvider(businessId));
-          ref.invalidate(analyticsProvider(businessId));
-        },
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.primary, AppColors.primaryLight],
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(queueProvider(businessId));
+            ref.invalidate(analyticsProvider(businessId));
+          },
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 110),
+            children: [
+              _OwnerHeader(onQrTap: () => context.push('/owner/qr')),
+              const SizedBox(height: 22),
+              _OwnerStatusCard(
+                completed: analytics.maybeWhen(
+                  data: (a) => '${a.completedToday}',
+                  orElse: () => '—',
                 ),
-                borderRadius: BorderRadius.circular(16),
+                avgWait: analytics.maybeWhen(
+                  data: (a) => '${a.avgWaitMinutes.toStringAsFixed(0)}m',
+                  orElse: () => '—',
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 18),
+              Row(
                 children: [
-                  const Text(
-                    'QueX Cuts Downtown',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: _ActionCard(
+                      icon: Icons.people_outline,
+                      label: 'Live Queue',
+                      onTap: () => context.go('/staff/dashboard'),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Open · 4 in queue',
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      _DashStat(
-                        label: 'Completed',
-                        value: analytics.maybeWhen(
-                          data: (a) => '${a.completedToday}',
-                          orElse: () => '—',
-                        ),
-                      ),
-                      const SizedBox(width: 24),
-                      _DashStat(
-                        label: 'Avg Wait',
-                        value: analytics.maybeWhen(
-                          data: (a) => '${a.avgWaitMinutes.toStringAsFixed(0)}m',
-                          orElse: () => '—',
-                        ),
-                      ),
-                    ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _ActionCard(
+                      icon: Icons.bar_chart,
+                      label: 'Analytics',
+                      onTap: () => context.push('/owner/analytics'),
+                    ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _ActionCard(
-                    icon: Icons.people_outline,
-                    label: 'Live Queue',
-                    onTap: () => context.go('/staff/dashboard'),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _ActionCard(
+                      icon: Icons.qr_code_2,
+                      label: 'QR Code',
+                      onTap: () => context.push('/owner/qr'),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _ActionCard(
-                    icon: Icons.bar_chart,
-                    label: 'Analytics',
-                    onTap: () => context.push('/owner/analytics'),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _ActionCard(
+                      icon: Icons.card_membership,
+                      label: 'Plan',
+                      onTap: () => context.push('/owner/subscription'),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _ActionCard(
-                    icon: Icons.qr_code_2,
-                    label: 'QR Code',
-                    onTap: () => context.push('/owner/qr'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _ActionCard(
-                    icon: Icons.card_membership,
-                    label: 'Subscription',
-                    onTap: () => context.push('/owner/subscription'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Current Queue',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 12),
-            queue.when(
-              data: (entries) => Column(
-                children: entries
-                    .take(5)
-                    .map(
-                      (e) => Card(
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            child: Text('${e.position}'),
-                          ),
-                          title: Text(e.customerName),
-                          subtitle: Text(e.service),
-                        ),
-                      ),
-                    )
-                    .toList(),
+                ],
               ),
-              loading: () => const LoadingView(),
-              error: (e, _) => Text(e.toString()),
-            ),
-          ],
+              const SizedBox(height: 28),
+              const _SectionTitle(
+                title: 'Current Queue',
+                subtitle: 'Next guests waiting at QueX Cuts Downtown',
+              ),
+              const SizedBox(height: 12),
+              queue.when(
+                data: (entries) => Column(
+                  children: entries
+                      .take(5)
+                      .map((e) => _OwnerQueueRow(entry: e))
+                      .toList(),
+                ),
+                loading: () => const LoadingView(),
+                error: (e, _) => Text(e.toString()),
+              ),
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: _OwnerNav(currentIndex: 0),
+      bottomNavigationBar: const _OwnerNav(currentIndex: 0),
+    );
+  }
+}
+
+class _OwnerHeader extends StatelessWidget {
+  const _OwnerHeader({required this.onQrTap});
+
+  final VoidCallback onQrTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const QueXLogo(size: 46),
+        const SizedBox(width: 12),
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Business Dashboard',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              SizedBox(height: 2),
+              Text(
+                'Manage queues in real time',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+        IconButton.filledTonal(
+          onPressed: onQrTap,
+          icon: const Icon(Icons.qr_code_2),
+          color: AppColors.accent,
+        ),
+      ],
+    );
+  }
+}
+
+class _OwnerStatusCard extends StatelessWidget {
+  const _OwnerStatusCard({
+    required this.completed,
+    required this.avgWait,
+  });
+
+  final String completed;
+  final String avgWait;
+
+  @override
+  Widget build(BuildContext context) {
+    return _SurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'QueX Cuts Downtown',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'Open now - 4 guests waiting',
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              StatusChip(label: 'LIVE', color: AppColors.accent),
+            ],
+          ),
+          const SizedBox(height: 22),
+          Row(
+            children: [
+              Expanded(child: _DashStat(label: 'Completed', value: completed)),
+              const SizedBox(width: 12),
+              Expanded(child: _DashStat(label: 'Avg Wait', value: avgWait)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.title, required this.subtitle});
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        ),
+      ],
+    );
+  }
+}
+
+class _OwnerQueueRow extends StatelessWidget {
+  const _OwnerQueueRow({required this.entry});
+
+  final QueueEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    return _SurfaceCard(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: AppColors.accent.withValues(alpha: 0.14),
+            child: Text(
+              '${entry.position}',
+              style: const TextStyle(
+                color: AppColors.accent,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  entry.customerName,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  entry.service,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+        ],
+      ),
+    );
+  }
+}
+
+class _SurfaceCard extends StatelessWidget {
+  const _SurfaceCard({
+    required this.child,
+    this.padding = const EdgeInsets.all(18),
+    this.margin,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry? margin;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: margin,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.divider),
+      ),
+      child: child,
     );
   }
 }
@@ -466,13 +614,17 @@ class _DashStat extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.w800,
-            )),
-        Text(label, style: const TextStyle(color: Colors.white70)),
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppColors.accent,
+            fontSize: 30,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(label, style: const TextStyle(color: AppColors.textSecondary)),
       ],
     );
   }
@@ -491,17 +643,30 @@ class _ActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.divider),
+          ),
           child: Column(
             children: [
-              Icon(icon, color: AppColors.primary, size: 32),
-              const SizedBox(height: 8),
-              Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+              Icon(icon, color: AppColors.accent, size: 30),
+              const SizedBox(height: 10),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ],
           ),
         ),
@@ -530,8 +695,10 @@ class _OwnerNav extends StatelessWidget {
         }
       },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Analytics'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard), label: 'Dashboard'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart), label: 'Analytics'),
         BottomNavigationBarItem(
           icon: Icon(Icons.card_membership),
           label: 'Plan',
@@ -549,60 +716,63 @@ class AnalyticsScreen extends ConsumerWidget {
     final analytics = ref.watch(analyticsProvider('biz_1'));
 
     return Scaffold(
-      appBar: const QueXAppBar(title: 'Analytics'),
-      body: analytics.when(
-        data: (a) => ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _MetricCard(
-                    label: 'Total Customers',
-                    value: '${a.totalCustomers}',
-                    icon: Icons.people,
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: analytics.when(
+          data: (a) => ListView(
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 110),
+            children: [
+              const _AnalyticsHeader(),
+              const SizedBox(height: 22),
+              Row(
+                children: [
+                  Expanded(
+                    child: _MetricCard(
+                      label: 'Total Customers',
+                      value: '${a.totalCustomers}',
+                      icon: Icons.people,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _MetricCard(
-                    label: 'Avg Wait',
-                    value: '${a.avgWaitMinutes.toStringAsFixed(1)}m',
-                    icon: Icons.timer,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _MetricCard(
+                      label: 'Avg Wait',
+                      value: '${a.avgWaitMinutes.toStringAsFixed(1)}m',
+                      icon: Icons.timer,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _MetricCard(
-                    label: 'Completed Today',
-                    value: '${a.completedToday}',
-                    icon: Icons.check_circle_outline,
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _MetricCard(
+                      label: 'Completed Today',
+                      value: '${a.completedToday}',
+                      icon: Icons.check_circle_outline,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _MetricCard(
-                    label: 'No Shows',
-                    value: '${a.noShows}',
-                    icon: Icons.person_off_outlined,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _MetricCard(
+                      label: 'No Shows',
+                      value: '${a.noShows}',
+                      icon: Icons.person_off_outlined,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Card(
-              child: Padding(
+                ],
+              ),
+              const SizedBox(height: 24),
+              _SurfaceCard(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'Weekly Trend',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                      style:
+                          TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -621,7 +791,8 @@ class AnalyticsScreen extends ConsumerWidget {
                           );
                           return Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
@@ -648,12 +819,47 @@ class AnalyticsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+          loading: () => const LoadingView(),
+          error: (e, _) => EmptyState(icon: Icons.error, title: e.toString()),
         ),
-        loading: () => const LoadingView(),
-        error: (e, _) => EmptyState(icon: Icons.error, title: e.toString()),
       ),
+    );
+  }
+}
+
+class _AnalyticsHeader extends StatelessWidget {
+  const _AnalyticsHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      children: [
+        QueXLogo(size: 46),
+        SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Analytics',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              SizedBox(height: 2),
+              Text(
+                'Today\'s wait-time performance',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+        StatusChip(label: 'TODAY', color: AppColors.accent),
+      ],
     );
   }
 }
@@ -671,30 +877,29 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: AppColors.primary),
-            const SizedBox(height: 12),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-              ),
+    return _SurfaceCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppColors.accent),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
             ),
-            Text(
-              label,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 13,
-              ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 13,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -720,9 +925,7 @@ class SubscriptionScreen extends ConsumerWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(
-                  color: plan.isCurrent
-                      ? AppColors.primary
-                      : AppColors.divider,
+                  color: plan.isCurrent ? AppColors.primary : AppColors.divider,
                   width: plan.isCurrent ? 2 : 1,
                 ),
               ),
@@ -742,7 +945,7 @@ class SubscriptionScreen extends ConsumerWidget {
                         ),
                         if (plan.isCurrent) ...[
                           const SizedBox(width: 8),
-                          StatusChip(
+                          const StatusChip(
                             label: 'Current',
                             color: AppColors.primary,
                           ),

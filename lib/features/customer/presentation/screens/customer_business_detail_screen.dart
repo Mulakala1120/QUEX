@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quex/core/theme/app_theme.dart';
+import 'package:quex/core/widgets/salon_mvp_widgets.dart' as salon;
 import 'package:quex/features/customer/presentation/providers/customer_session_provider.dart';
 import 'package:quex/features/shared/providers/app_providers.dart';
 
@@ -25,8 +26,7 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
             body: const Center(child: Text('Business not found')),
           );
         }
-        final isHealth = b.category == 'Clinic' || b.category == 'Hospital';
-        final accent = isHealth ? AppColors.clinicBlue : AppColors.accent;
+        const accent = AppColors.accent;
         final position = queue.maybeWhen(
           data: (entries) => entries.length + 1,
           orElse: () => b.queueCount + 1,
@@ -46,24 +46,14 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
                 ),
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: isHealth
-                            ? [const Color(0xFF0C4A6E), AppColors.surface]
-                            : [const Color(0xFF365314), AppColors.surface],
+                        colors: [Color(0xFFEAFBF0), AppColors.surface],
                       ),
                     ),
-                    child: Center(
-                      child: Icon(
-                        isHealth
-                            ? Icons.local_hospital_outlined
-                            : Icons.storefront_outlined,
-                        size: 72,
-                        color: accent.withValues(alpha: 0.5),
-                      ),
-                    ),
+                    child: const Center(child: salon.SalonAvatar(size: 104)),
                   ),
                 ),
               ),
@@ -84,7 +74,7 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          Icon(Icons.verified, color: accent, size: 22),
+                          const Icon(Icons.verified, color: accent, size: 22),
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -99,7 +89,7 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
                         const SizedBox(height: 4),
                         Text(
                           b.services.take(3).join(' · '),
-                          style: TextStyle(color: accent, fontSize: 13),
+                          style: const TextStyle(color: accent, fontSize: 13),
                         ),
                       ],
                       const SizedBox(height: 8),
@@ -108,7 +98,8 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
                           Text(
                             b.isOpen ? 'Open' : 'Closed',
                             style: TextStyle(
-                              color: b.isOpen ? accent : AppColors.error,
+                              color:
+                                  b.isOpen ? AppColors.accent : AppColors.error,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -142,7 +133,7 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
                             onTap: () {},
                           ),
                           _QuickAction(
-                            icon: Icons.medical_services_outlined,
+                            icon: Icons.content_cut_rounded,
                             label: 'Services',
                             onTap: () {},
                           ),
@@ -178,7 +169,7 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   '${b.waitMinutes} min',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 36,
                                     fontWeight: FontWeight.w900,
                                     color: accent,
@@ -198,7 +189,7 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
                                     b.waitMinutes <= 10
                                         ? 'Low crowd'
                                         : 'Moderate crowd',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: accent,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -210,27 +201,37 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      if (isHealth) ...[
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Services',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final service in const [
+                            'Haircut',
+                            'Haircut + Beard',
+                            'Kids Haircut',
+                            'Hair Color',
+                            'Styling',
+                          ])
+                            salon.ServiceChip(label: service),
+                        ],
+                      ),
+                      if (b.description != null) ...[
                         const SizedBox(height: 24),
-                        const Text(
-                          'Available now',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
+                        Text(
+                          b.description!,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            height: 1.4,
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        _DoctorRow(
-                          name: 'Dr. Priya Sharma',
-                          specialty: 'General Physician',
-                          nextIn: '${b.waitMinutes + 5} min',
-                          accent: accent,
-                        ),
-                        _DoctorRow(
-                          name: 'Dr. Rahul Verma',
-                          specialty: 'Dermatology',
-                          nextIn: '${b.waitMinutes + 15} min',
-                          accent: accent,
                         ),
                       ],
                       const SizedBox(height: 100),
@@ -266,7 +267,7 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
                             if (activeCheckIn?.businessId == b.id) {
                               context.go('/customer/queue');
                             } else {
-                              context.push('/customer/check-in/$businessId');
+                              context.push('/customer/join-queue/$businessId');
                             }
                           }
                         : null,
@@ -280,7 +281,7 @@ class CustomerBusinessDetailScreen extends ConsumerWidget {
                     child: Text(
                       activeCheckIn?.businessId == b.id
                           ? 'View Live Queue'
-                          : 'Join Waitlist',
+                          : 'Join Queue',
                       style: const TextStyle(fontWeight: FontWeight.w800),
                     ),
                   ),
@@ -333,56 +334,8 @@ class _QuickAction extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DoctorRow extends StatelessWidget {
-  const _DoctorRow({
-    required this.name,
-    required this.specialty,
-    required this.nextIn,
-    required this.accent,
-  });
-
-  final String name;
-  final String specialty;
-  final String nextIn;
-  final Color accent;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: accent.withValues(alpha: 0.2),
-            child: Icon(Icons.person, color: accent),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                Text(
-                  specialty,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            'Next in $nextIn',
-            style: TextStyle(color: accent, fontSize: 12, fontWeight: FontWeight.w600),
+            style:
+                const TextStyle(fontSize: 12, color: AppColors.textSecondary),
           ),
         ],
       ),

@@ -14,12 +14,12 @@ class CustomerNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF0A0A0A),
+        color: AppColors.background,
         border: Border(top: BorderSide(color: AppColors.divider, width: 0.5)),
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -28,14 +28,14 @@ class CustomerNavBar extends StatelessWidget {
                 activeIcon: Icons.home,
                 label: 'Home',
                 isActive: currentIndex == 0,
-                onTap: () => context.go('/customer/categories'),
+                onTap: () => context.go('/customer/home'),
               ),
               _NavItem(
-                icon: Icons.map_outlined,
-                activeIcon: Icons.map,
-                label: 'Map',
+                icon: Icons.search,
+                activeIcon: Icons.search,
+                label: 'Search',
                 isActive: currentIndex == 1,
-                onTap: () => context.go('/customer/map'),
+                onTap: () => context.go('/customer/search'),
               ),
               _NavItem(
                 icon: Icons.person_outline,
@@ -73,22 +73,11 @@ class _NavItem extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(isActive ? (activeIcon ?? icon) : icon, color: color, size: 26),
-            if (isActive)
-              Container(
-                margin: const EdgeInsets.only(top: 4),
-                width: 5,
-                height: 5,
-                decoration: const BoxDecoration(
-                  color: AppColors.accent,
-                  shape: BoxShape.circle,
-                ),
-              ),
-          ],
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+        child: Icon(
+          isActive ? (activeIcon ?? icon) : icon,
+          color: color,
+          size: 28,
         ),
       ),
     );
@@ -400,9 +389,12 @@ class FilterChipRow extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: BusinessSort.values
             .map(
-              (s) => ListTile(
-                title: Text(_sortLabel(s).replaceFirst('Sort: ', '')),
-                onTap: () => Navigator.pop(ctx, s),
+              (s) => Material(
+                color: Colors.transparent,
+                child: ListTile(
+                  title: Text(_sortLabel(s).replaceFirst('Sort: ', '')),
+                  onTap: () => Navigator.pop(ctx, s),
+                ),
               ),
             )
             .toList(),

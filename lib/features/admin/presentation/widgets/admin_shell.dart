@@ -100,7 +100,8 @@ class AdminShell extends StatelessWidget {
           ),
         ),
         appBar: AppBar(
-          title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+          title:
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
           actions: [
             ...?actions,
             IconButton(
@@ -131,24 +132,32 @@ class _Sidebar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 24, 20, 28),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
             child: Row(
               children: [
-                QueXBrandLogo(size: 40, style: QueXLogoStyle.admin),
-                SizedBox(width: 12),
+                const QueXBrandLogo(size: 40, style: QueXLogoStyle.admin),
+                const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'QueX',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 20,
+                    RichText(
+                      text: const TextSpan(
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 20,
+                        ),
+                        children: [
+                          TextSpan(text: 'Que'),
+                          TextSpan(
+                            text: 'X',
+                            style: TextStyle(color: AdminColors.primary),
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
+                    const Text(
                       'Business Admin',
                       style: TextStyle(color: Colors.white60, fontSize: 11),
                     ),
@@ -166,9 +175,8 @@ class _Sidebar extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Material(
-                    color: active
-                        ? AdminColors.sidebarActive
-                        : Colors.transparent,
+                    color:
+                        active ? AdminColors.sidebarActive : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
                     child: InkWell(
                       onTap: () => onNavigate(item.route),
@@ -274,7 +282,8 @@ class AdminStatCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               subtitle!,
-              style: TextStyle(color: c, fontSize: 12, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                  color: c, fontSize: 12, fontWeight: FontWeight.w600),
             ),
           ],
         ],

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quex/core/di/providers.dart';
 import 'package:quex/core/theme/app_theme.dart';
 import 'package:quex/core/widgets/common_widgets.dart';
+import 'package:quex/core/widgets/salon_mvp_widgets.dart' as salon;
 import 'package:quex/core/constants/app_constants.dart';
 import 'package:quex/domain/entities/entities.dart';
 import 'package:quex/features/customer/presentation/providers/customer_session_provider.dart';
@@ -51,7 +52,8 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
       body: business.when(
         data: (b) {
           if (b == null) {
-            return const EmptyState(icon: Icons.store_outlined, title: 'Not found');
+            return const EmptyState(
+                icon: Icons.store_outlined, title: 'Not found');
           }
           final name = profile.maybeWhen(
             data: (p) => p.name,
@@ -122,8 +124,10 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
                 onTap: () => _pickPeople(context),
                 child: _FieldLabel(
                   label: 'Number of people getting haircuts',
-                  value: '$_peopleCount ${_peopleCount == 1 ? 'person' : 'people'}',
-                  trailing: const Icon(Icons.expand_more, color: AppColors.textSecondary),
+                  value:
+                      '$_peopleCount ${_peopleCount == 1 ? 'person' : 'people'}',
+                  trailing: const Icon(Icons.expand_more,
+                      color: AppColors.textSecondary),
                 ),
               ),
               const SizedBox(height: 20),
@@ -174,9 +178,7 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: _isLoading
-                    ? null
-                    : () => _checkIn(context, b, name, phone),
+                onPressed: _isLoading ? null : () => _checkIn(b, name, phone),
                 child: _isLoading
                     ? const SizedBox(
                         height: 22,
@@ -212,12 +214,7 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
     if (picked != null) setState(() => _peopleCount = picked);
   }
 
-  Future<void> _checkIn(
-    BuildContext context,
-    Business b,
-    String name,
-    String phone,
-  ) async {
+  Future<void> _checkIn(Business b, String name, String phone) async {
     setState(() => _isLoading = true);
     final service = b.services.isNotEmpty ? b.services.first : 'Haircut';
     final entry = await ref.read(queueRepositoryProvider).joinQueue(
@@ -231,7 +228,8 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
           entry: entry,
         );
     ref.invalidate(queueProvider(widget.businessId));
-    if (mounted) context.go('/customer/queue');
+    if (!mounted) return;
+    context.go('/customer/queue');
   }
 }
 
@@ -325,7 +323,8 @@ class _NotificationOption extends StatelessWidget {
                     title,
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      color: selected ? AppColors.accent : AppColors.textPrimary,
+                      color:
+                          selected ? AppColors.accent : AppColors.textPrimary,
                     ),
                   ),
                   if (subtitle != null) ...[
@@ -419,7 +418,7 @@ class _LiveQueueScreenState extends ConsumerState<LiveQueueScreen> {
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: ElevatedButton(
-                      onPressed: () => context.go('/customer/categories'),
+                      onPressed: () => context.go('/customer/home'),
                       child: const Text('Find a salon'),
                     ),
                   ),
@@ -428,13 +427,16 @@ class _LiveQueueScreenState extends ConsumerState<LiveQueueScreen> {
             : queue.when(
                 data: (entries) {
                   final activeEntry = checkIn.entry;
+                  final nowServing = entries
+                      .where((e) => e.status == QueueStatus.serving)
+                      .map((e) => e.position)
+                      .fold<int>(0, (max, p) => p > max ? p : max);
+                  final peopleAhead = (activeEntry.position - 1).clamp(0, 99);
 
                   return RefreshIndicator(
                     color: AppColors.accent,
                     onRefresh: () async {
-                      await ref
-                          .read(activeCheckInProvider.notifier)
-                          .refresh();
+                      await ref.read(activeCheckInProvider.notifier).refresh();
                       if (businessId != null) {
                         ref.invalidate(queueProvider(businessId));
                       }
@@ -448,72 +450,18 @@ class _LiveQueueScreenState extends ConsumerState<LiveQueueScreen> {
                         const SizedBox(height: 20),
                         _ProgressSteps(entry: activeEntry),
                         const SizedBox(height: 20),
-                        DarkCard(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'YOUR ESTIMATED WAIT',
-                                style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 11,
-                                  letterSpacing: 1,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '${activeEntry.estimatedWaitMinutes} min',
-                                style: const TextStyle(
-                                  color: AppColors.accent,
-                                  fontSize: 48,
-                                  fontWeight: FontWeight.w800,
-                                  height: 1,
-                                ),
-                              ),
-                              const Divider(color: AppColors.divider, height: 32),
-                              const Text(
-                                'Head to the salon and let us know you\'re here',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                children: [
-                                  const Icon(Icons.person_outline,
-                                      color: AppColors.accent, size: 20),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '${activeEntry.position}${_ordinal(activeEntry.position)} in line',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  const Icon(Icons.content_cut,
-                                      color: AppColors.accent, size: 20),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '${entries.where((e) => e.status == QueueStatus.waiting || e.status == QueueStatus.serving).length} in queue',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              OutlinedButton(
-                                onPressed: () => _showWaitlist(
-                                  context,
-                                  entries,
-                                  activeEntry,
-                                ),
-                                child: const Text('View waitlist'),
-                              ),
-                            ],
-                          ),
+                        salon.QueueProgressCard(
+                          entry: activeEntry,
+                          nowServing: nowServing,
+                          peopleAhead: peopleAhead,
+                          totalInQueue: entries
+                              .where(
+                                (e) =>
+                                    e.status == QueueStatus.waiting ||
+                                    e.status == QueueStatus.serving ||
+                                    e.status == QueueStatus.called,
+                              )
+                              .length,
                         ),
                         const SizedBox(height: 16),
                         business.when(
@@ -524,6 +472,50 @@ class _LiveQueueScreenState extends ConsumerState<LiveQueueScreen> {
                           loading: () => const SizedBox(),
                           error: (_, __) => const SizedBox(),
                         ),
+                        const SizedBox(height: 16),
+                        business.maybeWhen(
+                          data: (b) => b == null
+                              ? const SizedBox.shrink()
+                              : Row(
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        onPressed: () =>
+                                            _openDirectionsForBusiness(b),
+                                        icon: const Icon(
+                                            Icons.navigation_rounded),
+                                        label: const Text('Directions'),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: () async {
+                                          await ref
+                                              .read(activeCheckInProvider
+                                                  .notifier)
+                                              .cancelCheckIn();
+                                          if (context.mounted) {
+                                            context.go('/customer/home');
+                                          }
+                                        },
+                                        icon: const Icon(Icons.close_rounded),
+                                        label: const Text('Leave Queue'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                          orElse: () => const SizedBox.shrink(),
+                        ),
+                        const SizedBox(height: 16),
+                        OutlinedButton(
+                          onPressed: () => _showWaitlist(
+                            context,
+                            entries,
+                            activeEntry,
+                          ),
+                          child: const Text('View Full Waitlist'),
+                        ),
                       ],
                     ),
                   );
@@ -532,7 +524,8 @@ class _LiveQueueScreenState extends ConsumerState<LiveQueueScreen> {
                 error: (e, _) => EmptyState(icon: Icons.error, title: '$e'),
               ),
       ),
-      bottomNavigationBar: const CustomerNavBar(currentIndex: 0),
+      bottomNavigationBar:
+          checkIn == null ? const CustomerNavBar(currentIndex: -1) : null,
     );
   }
 
@@ -553,43 +546,48 @@ class _LiveQueueScreenState extends ConsumerState<LiveQueueScreen> {
           ),
           const SizedBox(height: 16),
           ...entries.map(
-            (e) => ListTile(
-              leading: CircleAvatar(
-                backgroundColor: e.customerName == 'You'
-                    ? AppColors.accent
-                    : AppColors.surfaceLight,
-                child: Text(
-                  '${e.position}',
-                  style: TextStyle(
-                    color: e.customerName == 'You'
-                        ? AppColors.background
-                        : AppColors.textPrimary,
-                    fontWeight: FontWeight.w700,
+            (e) => Material(
+              color: Colors.transparent,
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: e.customerName == 'You'
+                      ? AppColors.accent
+                      : AppColors.surfaceLight,
+                  child: Text(
+                    '${e.position}',
+                    style: TextStyle(
+                      color: e.customerName == 'You'
+                          ? AppColors.background
+                          : AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-              ),
-              title: Text(
-                e.customerName == 'You' ? 'You' : e.customerName,
-                style: TextStyle(
-                  fontWeight: e.customerName == 'You'
-                      ? FontWeight.w800
-                      : FontWeight.w500,
+                title: Text(
+                  e.customerName == 'You' ? 'You' : e.customerName,
+                  style: TextStyle(
+                    fontWeight: e.customerName == 'You'
+                        ? FontWeight.w800
+                        : FontWeight.w500,
+                  ),
                 ),
+                subtitle: Text(e.service),
+                trailing: Text('~${e.estimatedWaitMinutes} min'),
               ),
-              subtitle: Text(e.service),
-              trailing: Text('~${e.estimatedWaitMinutes} min'),
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  String _ordinal(int n) {
-    if (n == 1) return 'st';
-    if (n == 2) return 'nd';
-    if (n == 3) return 'rd';
-    return 'th';
+Future<void> _openDirectionsForBusiness(Business b) async {
+  final uri = Uri.parse(
+    'https://www.google.com/maps/search/?api=1&query=${b.latitude},${b.longitude}',
+  );
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
 
@@ -649,7 +647,8 @@ class _ProgressSteps extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
-                color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
+                color:
+                    isActive ? AppColors.textPrimary : AppColors.textSecondary,
               ),
             ),
           ],
@@ -681,7 +680,8 @@ class _LocationCard extends ConsumerWidget {
           const SizedBox(height: 6),
           Text(
             business.address,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            style:
+                const TextStyle(color: AppColors.textSecondary, fontSize: 14),
           ),
           if (business.landmark != null) ...[
             const SizedBox(height: 4),
@@ -727,16 +727,22 @@ class _LocationCard extends ConsumerWidget {
             onTap: () =>
                 ref.read(favoritesProvider.notifier).toggle(business.id),
           ),
-          _ActionRow(icon: Icons.push_pin_outlined, label: 'Set haircut reminders', onTap: () {}),
+          _ActionRow(
+              icon: Icons.push_pin_outlined,
+              label: 'Set haircut reminders',
+              onTap: () {}),
           if (business.phone != null)
-            _ActionRow(icon: Icons.phone_outlined, label: business.phone!, onTap: () {}),
+            _ActionRow(
+                icon: Icons.phone_outlined,
+                label: business.phone!,
+                onTap: () {}),
           const Divider(color: AppColors.divider),
           _ActionRow(
             icon: Icons.delete_outline,
             label: 'Cancel check-in',
             onTap: () async {
               await ref.read(activeCheckInProvider.notifier).cancelCheckIn();
-              if (context.mounted) context.go('/customer/categories');
+              if (context.mounted) context.go('/customer/home');
             },
             destructive: true,
           ),
@@ -808,13 +814,176 @@ class BusinessDetailsScreen extends ConsumerWidget {
   }
 }
 
-class JoinQueueScreen extends ConsumerWidget {
+class JoinQueueScreen extends ConsumerStatefulWidget {
   const JoinQueueScreen({super.key, required this.businessId});
 
   final String businessId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return CheckInScreen(businessId: businessId);
+  ConsumerState<JoinQueueScreen> createState() => _JoinQueueScreenState();
+}
+
+class _JoinQueueScreenState extends ConsumerState<JoinQueueScreen> {
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  String _service = 'Haircut';
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.microtask(() async {
+      final profile = await ref.read(profileProvider.future);
+      if (!mounted) return;
+      _nameController.text = profile.name;
+      _phoneController.text = profile.phone;
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final business = ref.watch(businessDetailProvider(widget.businessId));
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text(
+          'Join Queue',
+          style: TextStyle(fontWeight: FontWeight.w900),
+        ),
+      ),
+      body: business.when(
+        data: (b) {
+          if (b == null) {
+            return const EmptyState(
+                icon: Icons.store_outlined, title: 'Salon not found');
+          }
+
+          const services = [
+            'Haircut',
+            'Haircut + Beard',
+            'Kids Haircut',
+            'Hair Color',
+            'Styling',
+          ];
+
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
+            children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Row(
+                    children: [
+                      const salon.SalonAvatar(size: 62),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              b.name,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${b.waitMinutes} min wait · ${b.distanceMiles.toStringAsFixed(1)} km',
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _nameController,
+                textInputAction: TextInputAction.next,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  prefixIcon: Icon(Icons.person_outline),
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(
+                  labelText: 'Phone',
+                  prefixIcon: Icon(Icons.phone_outlined),
+                ),
+              ),
+              const SizedBox(height: 22),
+              const Text(
+                'Choose Service',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final service in services)
+                    salon.ServiceChip(
+                      label: service,
+                      selected: _service == service,
+                      onTap: () => setState(() => _service = service),
+                    ),
+                ],
+              ),
+            ],
+          );
+        },
+        loading: () => const LoadingView(),
+        error: (e, _) => EmptyState(icon: Icons.error_outline, title: '$e'),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 18),
+          child: salon.SalonPrimaryButton(
+            label: 'Join Queue',
+            icon: Icons.confirmation_number_outlined,
+            isLoading: _loading,
+            onPressed: _loading ? null : _joinQueue,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _joinQueue() async {
+    final phone = _phoneController.text.trim();
+
+    setState(() => _loading = true);
+    final entry = await ref.read(queueRepositoryProvider).joinQueue(
+          businessId: widget.businessId,
+          customerName: 'You',
+          service: _service,
+          phone: phone.isEmpty ? null : phone,
+        );
+    await ref.read(activeCheckInProvider.notifier).setCheckIn(
+          businessId: widget.businessId,
+          entry: entry,
+        );
+    ref.invalidate(queueProvider(widget.businessId));
+    if (!mounted) return;
+    setState(() => _loading = false);
+    context.go('/customer/queue');
   }
 }

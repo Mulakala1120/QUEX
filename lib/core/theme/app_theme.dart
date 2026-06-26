@@ -1,36 +1,45 @@
 import 'package:flutter/material.dart';
 
-/// QueX mockup theme — true dark with neon lime accent.
+/// QueX salon-first MVP theme.
 class AppColors {
-  static const background = Color(0xFF000000);
-  static const surface = Color(0xFF1C1C1E);
-  static const surfaceLight = Color(0xFF2C2C2E);
-  static const accent = Color(0xFFA3E635);
-  static const accentDark = Color(0xFF84CC16);
+  static const background = Color(0xFFFFFFFF);
+  static const surface = Color(0xFFF8FAFC);
+  static const surfaceLight = Color(0xFFEFF6F2);
+
+  static const accent = Color(0xFF22C55E);
+  static const accentDark = Color(0xFF16A34A);
+  static const secondaryGreen = Color(0xFF4ADE80);
+
+  // Alias (older UI code used these names).
+  static const waitGreen = accent;
+  static const waitGreenDark = accentDark;
+
+  // Kept for health architecture, but hidden from the primary MVP UI.
   static const clinicBlue = Color(0xFF38BDF8);
   static const clinicBlueSoft = Color(0xFF0EA5E9);
-  static const textPrimary = Color(0xFFFFFFFF);
-  static const textSecondary = Color(0xFF9CA3AF);
-  static const divider = Color(0xFF3A3A3C);
+  static const textPrimary = Color(0xFF111827);
+  static const textSecondary = Color(0xFF6B7280);
+  static const divider = Color(0xFFE5E7EB);
+
   static const error = Color(0xFFEF4444);
-  static const success = Color(0xFFA3E635);
+  static const success = accent;
 
   static const primary = accent;
-  static const primaryLight = accentDark;
+  static const primaryLight = secondaryGreen;
   static const warning = Color(0xFFF59E0B);
 }
 
 class AppTheme {
-  static ThemeData get dark {
+  static ThemeData get light {
     final base = ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.accent,
-        secondary: AppColors.accent,
+        secondary: AppColors.secondaryGreen,
         surface: AppColors.surface,
-        onPrimary: Color(0xFF0A0A0A),
+        onPrimary: Colors.white,
         onSurface: AppColors.textPrimary,
       ),
       fontFamily: 'Roboto',
@@ -42,15 +51,17 @@ class AppTheme {
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: false,
+        surfaceTintColor: AppColors.background,
       ),
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        surfaceTintColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
       dividerTheme: const DividerThemeData(color: AppColors.divider),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(0xFF0A0A0A),
+        backgroundColor: AppColors.background,
         selectedItemColor: AppColors.accent,
         unselectedItemColor: AppColors.textSecondary,
         type: BottomNavigationBarType.fixed,
@@ -59,7 +70,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.accent,
-          foregroundColor: const Color(0xFF0A0A0A),
+          foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(26),
@@ -73,7 +84,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.accent,
-          side: const BorderSide(color: AppColors.accent, width: 1.5),
+          side: const BorderSide(color: AppColors.divider, width: 1.2),
           minimumSize: const Size(double.infinity, 48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
@@ -86,15 +97,15 @@ class AppTheme {
         labelStyle: const TextStyle(color: AppColors.textSecondary),
         hintStyle: const TextStyle(color: AppColors.textSecondary),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.divider),
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.divider),
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(18),
           borderSide: const BorderSide(color: AppColors.accent, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -111,5 +122,5 @@ class AppTheme {
     );
   }
 
-  static ThemeData get light => dark;
+  static ThemeData get dark => light;
 }

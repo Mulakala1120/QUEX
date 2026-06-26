@@ -18,7 +18,13 @@ class DummyDataSource {
       isOpen: true,
       description: 'Premium cuts and styling. Walk-ins welcome.',
       phone: '+91 40 5555 0101',
-      services: ['Haircut', 'Beard Trim', 'Styling', 'Hair Spa'],
+      services: [
+        'Haircut',
+        'Haircut + Beard',
+        'Kids Haircut',
+        'Hair Color',
+        'Styling'
+      ],
       hours: 'Mon–Sun 10am–9pm',
       latitude: 17.4156,
       longitude: 78.4347,
@@ -36,7 +42,13 @@ class DummyDataSource {
       queueCount: 5,
       isOpen: true,
       phone: '+91 40 5555 0102',
-      services: ['Haircut', 'Facial', 'Threading'],
+      services: [
+        'Haircut',
+        'Haircut + Beard',
+        'Kids Haircut',
+        'Hair Color',
+        'Styling'
+      ],
       hours: 'Daily 9am–8pm',
       latitude: 17.4401,
       longitude: 78.3489,
@@ -53,7 +65,13 @@ class DummyDataSource {
       waitMinutes: 18,
       queueCount: 7,
       isOpen: true,
-      services: ['Haircut', 'Colour', 'Keratin'],
+      services: [
+        'Haircut',
+        'Haircut + Beard',
+        'Kids Haircut',
+        'Hair Color',
+        'Styling'
+      ],
       hours: 'Daily 10am–9pm',
       latitude: 17.4435,
       longitude: 78.3772,
@@ -70,7 +88,13 @@ class DummyDataSource {
       waitMinutes: 25,
       queueCount: 4,
       isOpen: true,
-      services: ['Haircut', 'Kids Cut', 'Head Massage'],
+      services: [
+        'Haircut',
+        'Haircut + Beard',
+        'Kids Haircut',
+        'Hair Color',
+        'Styling'
+      ],
       hours: 'Mon–Sat 9am–8pm',
       latitude: 17.4849,
       longitude: 78.4138,
@@ -87,7 +111,13 @@ class DummyDataSource {
       waitMinutes: 8,
       queueCount: 2,
       isOpen: true,
-      services: ['Haircut', 'Beard', 'Grooming'],
+      services: [
+        'Haircut',
+        'Haircut + Beard',
+        'Kids Haircut',
+        'Hair Color',
+        'Styling'
+      ],
       hours: 'Tue–Sun 11am–9pm',
       latitude: 17.4226,
       longitude: 78.4071,
@@ -200,6 +230,73 @@ class DummyDataSource {
       ),
     ],
   };
+
+  static List<CustomerBooking> get bookings {
+    final now = DateTime.now();
+    return [
+      CustomerBooking(
+        id: 'bk_1',
+        businessId: 'biz_1',
+        businessName: 'Looks Salon Banjara Hills',
+        category: 'Salon',
+        service: 'Haircut & Styling',
+        scheduledAt: DateTime(now.year, now.month, now.day + 1, 14, 30),
+        status: BookingStatus.confirmed,
+        address: 'Road No 12, Banjara Hills, Hyderabad 500034',
+      ),
+      CustomerBooking(
+        id: 'bk_2',
+        businessId: 'biz_6',
+        businessName: 'Apollo Clinic Secunderabad',
+        category: 'Clinic',
+        service: 'General Consultation',
+        scheduledAt: DateTime(now.year, now.month, now.day + 2, 10, 0),
+        status: BookingStatus.confirmed,
+        address: 'MG Road, Secunderabad, Hyderabad 500003',
+        notes: 'Dr. Priya Sharma',
+      ),
+      CustomerBooking(
+        id: 'bk_3',
+        businessId: 'biz_2',
+        businessName: 'Naturals Gachibowli',
+        category: 'Salon',
+        service: 'Facial & Threading',
+        scheduledAt: DateTime(now.year, now.month, now.day + 4, 16, 0),
+        status: BookingStatus.pending,
+        address: 'Gachibowli Main Rd, Hyderabad 500032',
+      ),
+      CustomerBooking(
+        id: 'bk_4',
+        businessId: 'biz_5',
+        businessName: 'Studio 11 Jubilee Hills',
+        category: 'Salon',
+        service: 'Beard Grooming',
+        scheduledAt: now.subtract(const Duration(days: 5, hours: 2)),
+        status: BookingStatus.completed,
+        address: 'Jubilee Hills Check Post, Hyderabad 500033',
+      ),
+      CustomerBooking(
+        id: 'bk_5',
+        businessId: 'biz_4',
+        businessName: 'Green Trends Kukatpally',
+        category: 'Salon',
+        service: 'Kids Cut',
+        scheduledAt: now.subtract(const Duration(days: 12)),
+        status: BookingStatus.completed,
+        address: 'KPHB Colony, Kukatpally, Hyderabad 500072',
+      ),
+      CustomerBooking(
+        id: 'bk_6',
+        businessId: 'biz_3',
+        businessName: 'Jawed Habib Hitech City',
+        category: 'Salon',
+        service: 'Keratin Treatment',
+        scheduledAt: now.subtract(const Duration(days: 3)),
+        status: BookingStatus.cancelled,
+        address: 'Hitech City Rd, Madhapur, Hyderabad 500081',
+      ),
+    ];
+  }
 
   static final List<AppNotification> notifications = [
     AppNotification(
