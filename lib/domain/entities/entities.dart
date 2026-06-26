@@ -34,6 +34,8 @@ class Business extends Equatable {
   final List<String> services;
   final String? hours;
 
+  String get distanceDisplay => '${distanceMiles.toStringAsFixed(1)} km';
+
   @override
   List<Object?> get props => [
         id,

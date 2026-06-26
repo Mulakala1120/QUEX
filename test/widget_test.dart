@@ -8,6 +8,6 @@ void main() {
       const ProviderScope(child: QueXApp()),
     );
 
-    expect(find.text('QueX'), findsOneWidget);
+    expect(find.text('Your Time Matters'), findsOneWidget);
   });
 }

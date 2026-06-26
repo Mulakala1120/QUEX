@@ -1,17 +1,43 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const primary = Color(0xFF1B4D3E);
-  static const primaryLight = Color(0xFF2D7A62);
-  static const accent = Color(0xFFE8A838);
-  static const background = Color(0xFFF7F8FA);
-  static const surface = Colors.white;
-  static const textPrimary = Color(0xFF1A1D26);
+  static const primary = Color(0xFF22C55E);
+  static const primaryLight = Color(0xFF4ADE80);
+  static const accent = Color(0xFF4ADE80);
+  static const background = Color(0xFFFFFFFF);
+  static const card = Color(0xFFF8FAFC);
+  static const surface = Color(0xFFFFFFFF);
+  static const textPrimary = Color(0xFF111827);
   static const textSecondary = Color(0xFF6B7280);
   static const success = Color(0xFF22C55E);
   static const warning = Color(0xFFF59E0B);
   static const error = Color(0xFFEF4444);
   static const divider = Color(0xFFE5E7EB);
+  static const border = Color(0xFFE5E7EB);
+
+  static const gradientStart = Color(0xFF22C55E);
+  static const gradientEnd = Color(0xFF86EFAC);
+
+  static const LinearGradient primaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [gradientStart, gradientEnd],
+  );
+
+  static const LinearGradient softGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      Color(0xFFF0FDF4),
+      Color(0xFFFFFFFF),
+    ],
+  );
+}
+
+class AppSpacing {
+  static const double radius = 20;
+  static const double radiusSm = 12;
+  static const double radiusLg = 24;
 }
 
 class AppTheme {
@@ -23,6 +49,7 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.accent,
         surface: AppColors.surface,
+        onPrimary: Colors.white,
       ),
       scaffoldBackgroundColor: AppColors.background,
     );
@@ -34,66 +61,94 @@ class AppTheme {
         fontFamily: 'Roboto',
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.background,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: false,
+        titleTextStyle: TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+        ),
       ),
       cardTheme: CardThemeData(
-        color: AppColors.surface,
+        color: AppColors.card,
         elevation: 0,
+        margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.divider),
+          borderRadius: BorderRadius.circular(AppSpacing.radius),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 52),
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          minimumSize: const Size(double.infinity, 56),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.radius),
           ),
           textStyle: const TextStyle(
-            fontSize: 16,
+            fontSize: 17,
             fontWeight: FontWeight.w600,
+            letterSpacing: -0.2,
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          minimumSize: const Size(double.infinity, 52),
-          side: const BorderSide(color: AppColors.primary),
+          foregroundColor: AppColors.textPrimary,
+          backgroundColor: AppColors.card,
+          minimumSize: const Size(double.infinity, 56),
+          side: const BorderSide(color: AppColors.border),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.radius),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: AppColors.card,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.divider),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.divider),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
           borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        hintStyle: const TextStyle(color: AppColors.textSecondary),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.surface,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textSecondary,
         type: BottomNavigationBarType.fixed,
-        elevation: 8,
+        elevation: 0,
+        selectedLabelStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: AppColors.divider,
+        thickness: 1,
       ),
     );
   }
