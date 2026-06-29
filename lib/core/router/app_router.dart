@@ -9,7 +9,7 @@ import 'package:quex/features/shared/presentation/screens/splash_screen.dart';
 import 'package:quex/features/staff/presentation/screens/staff_screens.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/role-select',
+  initialLocation: '/',
   routes: [
     GoRoute(
       path: '/',

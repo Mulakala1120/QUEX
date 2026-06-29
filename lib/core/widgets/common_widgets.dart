@@ -1,30 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:quex/core/theme/app_theme.dart';
+import 'package:quex/core/widgets/quex_widgets.dart';
 
 class QueXLogo extends StatelessWidget {
-  const QueXLogo({super.key, this.size = 48});
+  const QueXLogo({super.key, this.size = 48, this.showWordmark = false});
 
   final double size;
+  final bool showWordmark;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(size * 0.25),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        'Q',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: size * 0.55,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
+    return QueXBrandLogo(size: size, showWordmark: showWordmark);
   }
 }
 
@@ -46,7 +32,7 @@ class QueXAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+      title: Text(title),
       automaticallyImplyLeading: showBack,
       actions: actions,
     );
@@ -59,26 +45,21 @@ class PrimaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.isLoading = false,
+    this.icon,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool isLoading;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: isLoading ? null : onPressed,
-      child: isLoading
-          ? const SizedBox(
-              height: 22,
-              width: 22,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
-          : Text(label),
+    return QueXPrimaryButton(
+      label: label,
+      onPressed: onPressed,
+      isLoading: isLoading,
+      icon: icon,
     );
   }
 }
@@ -88,14 +69,20 @@ class SecondaryButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
+    this.icon,
   });
 
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(onPressed: onPressed, child: Text(label));
+    return QueXSecondaryButton(
+      label: label,
+      onPressed: onPressed,
+      icon: icon,
+    );
   }
 }
 
@@ -149,14 +136,21 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 56, color: AppColors.textSecondary),
-            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.card,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Icon(icon, size: 48, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 20),
             Text(
               title,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
             ),
             if (subtitle != null) ...[
@@ -179,6 +173,8 @@ class LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator());
+    return const Center(
+      child: CircularProgressIndicator(color: AppColors.primary),
+    );
   }
 }
