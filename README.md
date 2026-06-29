@@ -2,7 +2,7 @@
 
 Skip the wait. Join the queue from anywhere.
 
-QueX is a Flutter mobile app for Android and iOS that lets customers join salon and clinic queues remotely — similar in flow to Great Clips, branded for QueX.
+QueX is a Flutter mobile app for Android and iOS that lets customers join salon and clinic queues remotely.
 
 **Author:** [Sai Deekshith Mulakala](https://github.com/Mulakala1120)
 
